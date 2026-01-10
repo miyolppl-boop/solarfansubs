@@ -7,7 +7,7 @@ body {
     background: #000;
     color: #fff4b0;
     font-family: Arial, sans-serif;
-    overflow-x: hidden; /* SAĞA TAŞMAYI KESER */
+    overflow-x: hidden;
 }
 
 /* ÜST BAR */
@@ -17,34 +17,22 @@ body {
     gap: 10px;
     padding: 10px;
     border-bottom: 2px solid #fff4b0;
-    width: 100%;
 }
 
-.logo img {
+.logo {
     height: 36px;
 }
 
-/* ARAMA */
-.search {
+#searchInput {
     flex: 1;
-}
-
-.search input {
-    width: 100%;
-    max-width: 260px;
     padding: 8px 14px;
     border-radius: 20px;
     border: none;
+    outline: none;
 }
 
-/* MENÜ */
 .menu {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 18px;
-    cursor: pointer;
-    white-space: nowrap;
+    font-size: 26px;
 }
 
 /* DUYURU */
@@ -55,8 +43,8 @@ body {
     border-radius: 15px;
 }
 
-/* SECTİON */
-.section {
+/* SERİLER */
+.series {
     margin: 20px;
 }
 
@@ -68,19 +56,31 @@ body {
 
 .series-card {
     background: #111;
-    padding: 18px;
-    border-radius: 10px;
+    padding: 20px;
+    border-radius: 12px;
     text-align: center;
     position: relative;
 }
 
+/* NEW ETİKETİ */
 .new-badge {
     position: absolute;
-    top: 6px;
-    right: 6px;
+    top: 8px;
+    right: 8px;
     background: red;
     color: white;
-    font-size: 11px;
-    padding: 3px 6px;
+    font-size: 12px;
+    padding: 4px 7px;
     border-radius: 6px;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 5px red; }
+    50% { box-shadow: 0 0 15px red; }
+    100% { box-shadow: 0 0 5px red; }
+}
+
+#noSeries {
+    margin-top: 15px;
 }
