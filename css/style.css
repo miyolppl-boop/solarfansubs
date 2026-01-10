@@ -1,101 +1,121 @@
+:root {
+    --black: #000000;
+    --yellow: #fff4a3;
+    --yellow-soft: #fff8c9;
+    --text-dark: #000000;
+}
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: Arial, sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
-/* ARKA PLAN */
 body {
-    background: #000000;
-    color: #FFF9C4;
+    background-color: var(--black);
+    color: var(--yellow);
+    min-height: 100vh;
 }
 
-/* ÜST BAR */
-.topbar {
+/* ===== HEADER ===== */
+header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 15px;
-    border-bottom: 2px solid #FFF9C4;
-    background: #000000;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--yellow);
 }
 
-/* LOGO */
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 20px;
+.site-name {
+    font-size: 22px;
     font-weight: bold;
-    color: #FFF9C4;
+    color: var(--yellow);
 }
 
-.logo img {
-    height: 40px;
+/* ===== SEARCH ===== */
+.search-container {
+    margin: 30px auto 0;
+    max-width: 500px;
+    padding: 0 15px;
 }
 
-/* ARAMA */
-.search input {
-    background: #000000;
-    border: 1px solid #FFF9C4;
-    padding: 7px 10px;
-    color: #FFF9C4;
-    border-radius: 6px;
+.search-box {
+    display: flex;
+    background: var(--yellow-soft);
+    border-radius: 8px;
+    overflow: hidden;
 }
 
-.search input::placeholder {
-    color: #FFF9C4;
+.search-box input {
+    flex: 1;
+    border: none;
+    padding: 12px;
+    font-size: 16px;
+    outline: none;
+    background: transparent;
+    color: var(--text-dark);
 }
 
-/* MENÜ */
-.menu {
-    font-size: 26px;
+.search-box button {
+    border: none;
+    background: transparent;
+    padding: 0 15px;
     cursor: pointer;
-    color: #FFF9C4;
+    font-size: 18px;
 }
 
-/* YAN MENÜ */
-.side-menu {
-    position: fixed;
-    top: 0;
-    right: -220px;
-    width: 220px;
-    height: 100%;
-    background: #000000;
-    border-left: 2px solid #FFF9C4;
-    padding-top: 70px;
-    transition: 0.3s;
-}
-
-.side-menu a {
-    display: block;
-    padding: 15px;
-    color: #FFF9C4;
-    text-decoration: none;
-    border-bottom: 1px solid #FFF9C4;
-    text-align: center;
-}
-
-.side-menu a:hover {
-    background: #FFF9C4;
-    color: #000000;
-}
-
-.side-menu.open {
-    right: 0;
-}
-
-/* DUYURU */
-.announcement {
-    margin: 25px;
+/* ===== INFO BOX ===== */
+.info-box {
+    background: var(--yellow-soft);
+    color: var(--text-dark);
+    max-width: 700px;
+    margin: 25px auto;
     padding: 20px;
-    border: 2px solid #FFF9C4;
     border-radius: 10px;
-    background: #000000;
+    text-align: center;
+    font-size: 15px;
 }
 
-.announcement h2 {
-    margin-bottom: 10px;
-    color: #FFF9C4;
+/* ===== CONTENT ===== */
+.content {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 15px;
+}
+
+.series-title {
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.series-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+}
+
+.series-card {
+    background: var(--yellow-soft);
+    color: var(--text-dark);
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.series-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px var(--yellow);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+    .site-name {
+        font-size: 18px;
+    }
+
+    .info-box {
+        font-size: 14px;
+    }
 }
