@@ -40,3 +40,7 @@ searchInput.addEventListener("input", () => {
     const q = searchInput.value.toLowerCase();
     render(seriesList.filter(s => s.name.toLowerCase().includes(q)));
 });
+[11/1 00:31] R: prevBtn.onclick = () => { ... }
+nextBtn.onclick = () => { ... }
+[11/1 00:31] R: db.collection("comments")
+[11/1 00:31] R: localStorage.setItem(`last_${series}`, chapter);
