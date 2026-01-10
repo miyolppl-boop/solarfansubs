@@ -1,7 +1,9 @@
 const seriesList = [
-    // ÖRNEK EKLEME:
-    // { name: "Solar Night", isNew: true },
-    // { name: "Moon Blade", isNew: false }
+    { name: "Solar Night", isNew: true },
+    { name: "Moon Blade", isNew: false },
+    { name: "Crimson Sun", isNew: true },
+    { name: "Eclipse Hunter", isNew: false },
+    { name: "Starfall Legend", isNew: false }
 ];
 
 const grid = document.getElementById("seriesGrid");
