@@ -1,86 +1,42 @@
+const seriesList = [
+    // ÖRNEK EKLEME:
+    // { name: "Solar Night", isNew: true },
+    // { name: "Moon Blade", isNew: false }
+];
+
+const grid = document.getElementById("seriesGrid");
+const noSeries = document.getElementById("noSeries");
+const searchInput = document.getElementById("searchInput");
+
+render(seriesList);
+
+function render(list) {
+    grid.innerHTML = "";
+
+    if (list.length === 0) {
+        noSeries.style.display = "block";
+        return;
+    }
+
+    noSeries.style.display = "none";
+
+    list.forEach(series => {
+        const card = document.createElement("div");
+        card.className = "series-card";
+        card.textContent = series.name;
+
+        if (series.isNew) {
+            const badge = document.createElement("div");
+            badge.className = "new-badge";
+            badge.textContent = "NEW";
+            card.appendChild(badge);
+        }
+
+        grid.appendChild(card);
+    });
+}
+
 searchInput.addEventListener("input", () => {
-    const q = searchInput.value.trim().toLowerCase();
-
-    // --- yazılırsa tüm serileri göster
-    if (q === "---") {
-        render(seriesList);
-        return;
-    }
-
-    // boşsa da tüm serileri göster
-    if (q === "") {
-        render(seriesList);
-        return;
-    }
-
-    render(
-        seriesList.filter(s =>
-            s.name.toLowerCase().includes(q)
-        )
-    );
+    const q = searchInput.value.toLowerCase();
+    render(seriesList.filter(s => s.name.toLowerCase().includes(q)));
 });
-const seriesList = [
-    { name: "Solar Night", isNew: true },
-    { name: "Moon Blade", isNew: false },
-    { name: "Crimson Sun", isNew: true }
-];
-
-{ name: "Seri Adı", isNew: true },
-const seriesList = [
-    { name: "Test Seri 1", isNew: true },
-    { name: "Test Seri 2", isNew: false }
-];
-const img = document.createElement("img");
-img.src = series.cover;
-img.alt = series.name;
-img.className = "series-cover";
-
-const title = document.createElement("div");
-title.className = "series-title";
-title.textContent = series.name;
-
-card.appendChild(img);
-card.appendChild(title);
-// Önceki / Sonraki Bölüm
-const prevBtn = document.getElementById("prevChapter");
-const nextBtn = document.getElementById("nextChapter");
-
-if (prevBtn && nextBtn && data) {
-    prevBtn.onclick = () => {
-        const prev = Number(chapter) - 1;
-        if (data.list[prev]) {
-            location.href = `chapter.html?series=${series}&chapter=${prev}`;
-        }
-    };
-
-    nextBtn.onclick = () => {
-        const next = Number(chapter) + 1;
-        if (data.list[next]) {
-            location.href = `chapter.html?series=${series}&chapter=${next}`;
-        }
-    };
-}
-
-// Basit Yorum Sistemi (localStorage)
-const commentInput = document.getElementById("commentInput");
-const commentList = document.getElementById("commentList");
-const sendBtn = document.getElementById("sendComment");
-
-const commentKey = `comments_${series}_${chapter}`;
-const savedComments = JSON.parse(localStorage.getItem(commentKey)) || [];
-
-savedComments.forEach(c => addComment(c));
-
-sendBtn.onclick = () => {
-    if (!commentInput.value.trim()) return;
-    savedComments.push(commentInput.value);
-    localStorage.setItem(commentKey, JSON.stringify(savedComments));
-    addComment(commentInput.value);
-    commentInput.value = "";
-};
-
-function addComment(text) {
-    const div = document.createElement("div");
-    div.textContent = text;
-    commentList.appendChild(div);
-}
