@@ -19,3 +19,25 @@ searchInput.addEventListener("input", () => {
         )
     );
 });
+const seriesList = [
+    { name: "Solar Night", isNew: true },
+    { name: "Moon Blade", isNew: false },
+    { name: "Crimson Sun", isNew: true }
+];
+
+{ name: "Seri Adı", isNew: true },
+const seriesList = [
+    { name: "Test Seri 1", isNew: true },
+    { name: "Test Seri 2", isNew: false }
+];
+const img = document.createElement("img");
+img.src = series.cover;
+img.alt = series.name;
+img.className = "series-cover";
+
+const title = document.createElement("div");
+title.className = "series-title";
+title.textContent = series.name;
+
+card.appendChild(img);
+card.appendChild(title);
