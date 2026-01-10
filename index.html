@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>SolarFansubs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -20,25 +21,27 @@
     <div class="menu" onclick="toggleMenu()">☰</div>
 </header>
 
-<!-- AÇILIR MENÜ -->
 <div id="sideMenu" class="side-menu">
-    <a href="#">Kayıt Ol</a>
-    <a href="#">Giriş Yap</a>
+    <a href="#" onclick="toggleSeries()">Tüm Seriler</a>
 </div>
 
 <section class="announcement">
     <h2>ÖNEMLİ DUYURU</h2>
     <p>
-        Herkese Merhaba! Bu bizim Tek gerçek Sitemizdir.
-        Eğer Bizi başka yerlerden görüyorsanız bize bildirin.
+        Herkese Merhaba! Bu bizim <b>TEK</b> gerçek sitemizdir.
     </p>
 </section>
 
-<script>
-function toggleMenu() {
-    document.getElementById("sideMenu").classList.toggle("open");
-}
-</script>
+<section id="allSeries" class="all-series">
+    <h2>TÜM SERİLER</h2>
 
+    <!-- BOŞSA MESAJ -->
+    <p id="noSeries" class="no-series">Henüz seri eklenmedi.</p>
+
+    <!-- SERİLER BURAYA GELECEK -->
+    <div id="seriesGrid" class="series-grid"></div>
+</section>
+
+<script src="js/series.js"></script>
 </body>
 </html>
