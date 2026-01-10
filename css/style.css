@@ -1,5 +1,5 @@
 :root {
-    --black: #000;
+    --black: #000000;
     --yellow: #fff4a3;
     --yellow-soft: #fff8cc;
 }
@@ -8,30 +8,31 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: Arial, sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 body {
-    background: var(--black);
+    background-color: var(--black);
     color: var(--yellow);
 }
 
 /* HEADER */
 .top-bar {
-    background: linear-gradient(to right, #000, #222);
-    padding: 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 15px;
+    background: linear-gradient(to right, #000, #222);
 }
 
 .logo {
-    font-weight: bold;
     font-size: 20px;
+    font-weight: bold;
 }
 
 .icons span {
     margin-left: 15px;
+    font-size: 20px;
     cursor: pointer;
 }
 
@@ -44,9 +45,9 @@ body {
 }
 
 .announcement-title {
+    display: inline-block;
     background: var(--yellow);
     color: #000;
-    display: inline-block;
     padding: 6px 12px;
     font-weight: bold;
     margin-bottom: 10px;
@@ -58,12 +59,12 @@ body {
 }
 
 .section h2 {
+    margin-bottom: 15px;
     border-bottom: 1px solid var(--yellow);
     padding-bottom: 10px;
-    margin-bottom: 20px;
 }
 
-/* SERIES */
+/* SERIES GRID */
 .series-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -87,6 +88,7 @@ body {
 .series-name {
     padding: 10px;
     font-weight: bold;
+    text-align: center;
 }
 
 /* NEW BADGE */
