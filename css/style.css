@@ -99,3 +99,8 @@ body {
     margin-bottom: 10px;
     color: #FFF9C4;
 }
+.no-series {
+    text-align: center;
+    color: #aaa;
+    margin-top: 20px;
+}
