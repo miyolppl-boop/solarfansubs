@@ -1,63 +1,40 @@
-// TÜM SERİLER BURADA TUTULUR
 const seriesList = [
-    // Şimdilik boş
-    // Örnek:
-    // { name: "Solar Night", isNew: true },
-    // { name: "Dark Moon", isNew: false }
+    // { name: "Örnek Seri", isNew: true }
 ];
 
 const newGrid = document.getElementById("newSeriesGrid");
 const allGrid = document.getElementById("allSeriesGrid");
-
-const noNewText = document.getElementById("noNewSeries");
-const noAllText = document.getElementById("noAllSeries");
+const noNew = document.getElementById("noNewSeries");
+const noAll = document.getElementById("noAllSeries");
 
 function renderSeries() {
-
-    // TÜM SERİLER
-    if (seriesList.length === 0) {
-        noAllText.style.display = "block";
-    } else {
-        noAllText.style.display = "none";
-    }
-
-    // YENİ SERİLER
     const newSeries = seriesList.filter(s => s.isNew);
 
-    if (newSeries.length === 0) {
-        noNewText.style.display = "block";
-    } else {
-        noNewText.style.display = "none";
+    if (newSeries.length === 0) noNew.style.display = "block";
+    else {
+        noNew.style.display = "none";
+        newSeries.forEach(s => newGrid.appendChild(createCard(s, true)));
     }
 
-    // TÜM SERİLERİ BAS
-    seriesList.forEach(series => {
-        const card = createSeriesCard(series);
-        allGrid.appendChild(card);
-    });
-
-    // YENİ SERİLERİ BAS
-    newSeries.forEach(series => {
-        const card = createSeriesCard(series, true);
-        newGrid.appendChild(card);
-    });
+    if (seriesList.length === 0) noAll.style.display = "block";
+    else {
+        noAll.style.display = "none";
+        seriesList.forEach(s => allGrid.appendChild(createCard(s)));
+    }
 }
 
-function createSeriesCard(series, showNew = false) {
+function createCard(series, isNew = false) {
     const card = document.createElement("div");
     card.className = "series-card";
 
-    if (showNew) {
+    if (isNew) {
         const badge = document.createElement("div");
         badge.className = "new-badge";
         badge.innerText = "NEW";
         card.appendChild(badge);
     }
 
-    card.innerHTML += `
-        <div class="series-name">${series.name}</div>
-    `;
-
+    card.innerHTML += `<div>${series.name}</div>`;
     return card;
 }
 
