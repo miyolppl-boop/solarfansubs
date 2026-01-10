@@ -9,18 +9,26 @@
 <body>
 
 <header class="topbar">
+    <!-- LOGO -->
     <div class="logo">
-        <span>SolarFansubs</span>
+        <img src="img/logo.png" alt="SolarFansubs">
     </div>
 
+    <!-- ARAMA -->
+    <div class="search">
+        <input type="text" placeholder="Seri ara...">
+    </div>
+
+    <!-- MENU -->
     <div class="menu" onclick="toggleMenu()">☰</div>
 </header>
 
-<!-- AÇILIR MENÜ -->
+<!-- YAN MENÜ -->
 <div id="sideMenu" class="side-menu">
     <a href="#" onclick="toggleAllSeries()">Tüm Seriler</a>
 </div>
 
+<!-- ÖNEMLİ DUYURU -->
 <section class="announcement">
     <h2>ÖNEMLİ DUYURU</h2>
     <p>
@@ -33,16 +41,12 @@
     <h2>YENİ GELEN SERİLER</h2>
 
     <p id="noNewSeries" class="no-series">Henüz yeni seri yok.</p>
-
     <div id="newSeriesGrid" class="series-grid"></div>
 </section>
 
-<!-- TÜM SERİLER (SADECE MENÜDEN) -->
+<!-- TÜM SERİLER (SADECE MENÜDEN AÇILIR) -->
 <section id="allSeriesSection" class="section all-series">
-    <h2>TÜM SERİLER</h2>
-
     <p id="noAllSeries" class="no-series">Henüz seri eklenmedi.</p>
-
     <div id="allSeriesGrid" class="series-grid"></div>
 </section>
 
