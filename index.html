@@ -1,19 +1,44 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>SolarFansubs</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
 <header class="topbar">
     <div class="logo">
-        <img src="img/logo.png" alt="SolarFansubs Logo">
+        <img src="img/logo.png" alt="SolarFansubs">
+        <span>SolarFansubs</span>
     </div>
 
-    <div class="menu-icon" onclick="openMenu()">☰</div>
+    <div class="search">
+        <input type="text" placeholder="Seri ara...">
+    </div>
+
+    <div class="menu" onclick="toggleMenu()">☰</div>
 </header>
 
-<!-- MOBİL MENÜ -->
-<div id="mobileMenu" class="mobile-menu">
-    <div class="menu-header">
-        <span onclick="closeMenu()">✕</span>
-    </div>
-
-    <div class="menu-buttons">
-        <a href="login.html" class="btn">Giriş Yap</a>
-        <a href="register.html" class="btn outline">Kayıt Ol</a>
-    </div>
+<!-- AÇILIR MENÜ -->
+<div id="sideMenu" class="side-menu">
+    <a href="#">Kayıt Ol</a>
+    <a href="#">Giriş Yap</a>
 </div>
+
+<section class="announcement">
+    <h2>ÖNEMLİ DUYURU</h2>
+    <p>
+        Herkese Merhaba! Bu bizim Tek gerçek Sitemizdir.
+        Eğer Bizi başka yerlerden görüyorsanız bize bildirin.
+    </p>
+</section>
+
+<script>
+function toggleMenu() {
+    document.getElementById("sideMenu").classList.toggle("open");
+}
+</script>
+
+</body>
+</html>
