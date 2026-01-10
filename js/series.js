@@ -1,7 +1,5 @@
 const seriesList = [
-    // ÖRNEK:
     // { name: "Solar Night", isNew: true },
-    // { name: "Moon Blade", isNew: false }
 ];
 
 const newGrid = document.getElementById("newSeriesGrid");
@@ -41,17 +39,10 @@ function createCard(series, isNew = false) {
 
 searchInput.addEventListener("input", () => {
     const q = searchInput.value.toLowerCase();
-    const filtered = seriesList.filter(s =>
-        s.name.toLowerCase().includes(q)
-    );
-    renderSeries(filtered);
+    renderSeries(seriesList.filter(s => s.name.toLowerCase().includes(q)));
 });
 
-function toggleMenu() {
-    document.getElementById("sideMenu").classList.toggle("open");
-}
-
-function toggleAllSeries() {
-    document.getElementById("allSeriesSection").classList.toggle("hidden");
-    toggleMenu();
+function goAllSeries() {
+    document.getElementById("allSeriesSection")
+        .scrollIntoView({ behavior: "smooth" });
 }
