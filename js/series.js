@@ -1,44 +1,21 @@
-const seriesList = [
-    { name: "Solar Night", isNew: true },
-    { name: "Moon Blade", isNew: false },
-    { name: "Crimson Sun", isNew: true },
-    { name: "Eclipse Hunter", isNew: false },
-    { name: "Starfall Legend", isNew: false }
-];
+searchInput.addEventListener("input", () => {
+    const q = searchInput.value.trim().toLowerCase();
 
-const grid = document.getElementById("seriesGrid");
-const noSeries = document.getElementById("noSeries");
-const searchInput = document.getElementById("searchInput");
-
-render(seriesList);
-
-function render(list) {
-    grid.innerHTML = "";
-
-    if (list.length === 0) {
-        noSeries.style.display = "block";
+    // --- yazılırsa tüm serileri göster
+    if (q === "---") {
+        render(seriesList);
         return;
     }
 
-    noSeries.style.display = "none";
+    // boşsa da tüm serileri göster
+    if (q === "") {
+        render(seriesList);
+        return;
+    }
 
-    list.forEach(series => {
-        const card = document.createElement("div");
-        card.className = "series-card";
-        card.textContent = series.name;
-
-        if (series.isNew) {
-            const badge = document.createElement("div");
-            badge.className = "new-badge";
-            badge.textContent = "NEW";
-            card.appendChild(badge);
-        }
-
-        grid.appendChild(card);
-    });
-}
-
-searchInput.addEventListener("input", () => {
-    const q = searchInput.value.toLowerCase();
-    render(seriesList.filter(s => s.name.toLowerCase().includes(q)));
+    render(
+        seriesList.filter(s =>
+            s.name.toLowerCase().includes(q)
+        )
+    );
 });
