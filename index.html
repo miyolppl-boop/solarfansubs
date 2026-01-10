@@ -3,28 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <title>SolarFansubs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- CSS -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <header>
-    <h1>SolarFansubs</h1>
-    <p>Güneş Fanı Altyazıları</p>
-  </header>
+<header class="topbar">
+  <div class="logo">☀️ SolarFansubs</div>
+  <div class="menu-btn" onclick="toggleMenu()">☰</div>
+</header>
 
-  <nav>
-    <a href="#">Ana Sayfa</a>
-    <a href="#">Seriler</a>
-    <a href="#">Yorumlar</a>
-    <a href="#">Giriş</a>
-  </nav>
+<div id="sideMenu" class="side-menu">
+  <a href="#">Ana Sayfa</a>
+  <a href="#">Tüm Seriler</a>
+  <a href="#">Popüler</a>
+  <a href="#">Giriş</a>
+</div>
 
-  <main style="padding:20px; text-align:center;">
-    <h2>Hoş Geldiniz 🌞</h2>
-    <p>En güncel çeviriler burada.</p>
-  </main>
+
+<section class="section">
+  <h2>POPÜLER</h2>
+
+  <div class="card">
+    <img src="https://via.placeholder.com/300x400" alt="">
+    <div class="card-info">
+      <h3>Örnek Seri</h3>
+      <span>Bölüm 10</span>
+      <span>Bölüm 9</span>
+    </div>
+  </div>
+</section>
+
+<script>
+function toggleMenu() {
+  document.getElementById("sideMenu").classList.toggle("open");
+}
+</script>
 
 </body>
 </html>
