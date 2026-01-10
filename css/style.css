@@ -108,3 +108,43 @@ img/
      ├─ solar-night.jpg
      ├─ moon-blade.jpg
      └─ crimson-sun.jpg
+.chapter-nav {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+
+.chapter-nav button {
+    padding: 10px 15px;
+    border: none;
+    background: #fff4b0;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.chapter-end {
+    text-align: center;
+    margin: 40px 0;
+}
+
+.comments {
+    margin: 20px;
+}
+
+.comments textarea {
+    width: 100%;
+    height: 80px;
+    margin-bottom: 10px;
+}
+
+.comments button {
+    padding: 8px 12px;
+    background: #fff4b0;
+    border: none;
+    cursor: pointer;
+}
+
+#commentList div {
+    border-bottom: 1px solid #555;
+    padding: 5px 0;
+}
