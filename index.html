@@ -2,57 +2,46 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>SolarFansubs</title>
+    <title>SolarFansub</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <header class="topbar">
-    <!-- LOGO -->
     <div class="logo">
-        <img src="img/logo.png" alt="SolarFansubs">
+        <img src="img/logo.png" alt="SolarFansub">
     </div>
 
-    <!-- ARAMA -->
     <div class="search">
-        <input type="text" placeholder="Seri ara...">
+        <input type="text" id="searchInput" placeholder="Seri ara...">
     </div>
 
-    <!-- MENU -->
     <div class="menu" onclick="toggleMenu()">☰</div>
 </header>
 
-<!-- YAN MENÜ -->
+<!-- SAĞ MENÜ -->
 <div id="sideMenu" class="side-menu">
     <a href="#" onclick="toggleAllSeries()">Tüm Seriler</a>
 </div>
 
-<!-- ÖNEMLİ DUYURU -->
 <section class="announcement">
     <h2>ÖNEMLİ DUYURU</h2>
-    <p>
-        Herkese Merhaba! Bu bizim <b>TEK</b> gerçek sitemizdir.
-    </p>
+    <p>Herkese Merhaba! Bu bizim <b>TEK</b> gerçek sitemizdir.</p>
 </section>
 
-<!-- YENİ GELEN SERİLER -->
 <section class="section">
     <h2>YENİ GELEN SERİLER</h2>
-
-    <p id="noNewSeries" class="no-series">Henüz yeni seri yok.</p>
+    <p id="noNewSeries">Henüz yeni seri yok.</p>
     <div id="newSeriesGrid" class="series-grid"></div>
 </section>
 
-<!-- TÜM SERİLER (SADECE MENÜDEN AÇILIR) -->
-<section id="allSeriesSection" class="section all-series">
-    <p id="noAllSeries" class="no-series">Henüz seri eklenmedi.</p>
+<section id="allSeriesSection" class="section hidden">
+    <h2>TÜM SERİLER</h2>
+    <p id="noAllSeries">Henüz seri eklenmedi.</p>
     <div id="allSeriesGrid" class="series-grid"></div>
 </section>
 
 <script src="js/series.js"></script>
 </body>
 </html>
-<div class="search">
-    <input type="text" id="searchInput" placeholder="Seri ara...">
-</div>
