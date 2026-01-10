@@ -17,13 +17,10 @@
         <input type="text" id="searchInput" placeholder="Seri ara...">
     </div>
 
-    <div class="menu" onclick="toggleMenu()">☰</div>
+    <div class="menu" onclick="goAllSeries()">
+        ☰ <span>Tüm Seriler</span>
+    </div>
 </header>
-
-<!-- SAĞ MENÜ -->
-<div id="sideMenu" class="side-menu">
-    <a href="#" onclick="toggleAllSeries()">Tüm Seriler</a>
-</div>
 
 <section class="announcement">
     <h2>ÖNEMLİ DUYURU</h2>
@@ -36,7 +33,7 @@
     <div id="newSeriesGrid" class="series-grid"></div>
 </section>
 
-<section id="allSeriesSection" class="section hidden">
+<section id="allSeriesSection" class="section">
     <h2>TÜM SERİLER</h2>
     <p id="noAllSeries">Henüz seri eklenmedi.</p>
     <div id="allSeriesGrid" class="series-grid"></div>
