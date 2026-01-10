@@ -4,46 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>solarfansub</title>
-
-    <!-- CSS BAĞLANTISI -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- HEADER -->
-    <header>
-        <div class="site-name">solarfansub</div>
-    </header>
-
-    <!-- SEARCH -->
-    <div class="search-container">
-        <div class="search-box">
-            <input type="text" placeholder="Seri ara...">
-            <button>🔍</button>
-        </div>
+<header class="top-bar">
+    <div class="logo">solarfansub</div>
+    <div class="icons">
+        <span>🔍</span>
+        <span>☰</span>
     </div>
+</header>
 
-    <!-- INFO BOX -->
-    <div class="info-box">
-        Herkese Merhaba <br>
-        Bu Tek gerçek Sitemizdir <br>
-        Serilerimi ücretsiz bir şekilde okuyabilirsiniz <br>
-        bize destek olmayı unutmayın!
+<section class="announcement">
+    <div class="announcement-title">ÖNEMLİ DUYURU</div>
+    <p>
+        Herkese Merhaba! <br>
+        Bu TEK gerçek sitemizdir. <br>
+        Serilerimizi ücretsiz okuyabilirsiniz. <br>
+        Lütfen sahte sitelere giriş yapmayın.
+    </p>
+</section>
+
+<section class="section">
+    <h2>YENİ BÖLÜMLER</h2>
+
+    <div class="series-grid" id="seriesList">
+        <!-- JS ile dolduruluyor -->
     </div>
+</section>
 
-    <!-- SERIES -->
-    <div class="content">
-        <div class="series-title">Seriler</div>
-
-        <div class="series-grid">
-            <div class="series-card">Seri 1</div>
-            <div class="series-card">Seri 2</div>
-            <div class="series-card">Seri 3</div>
-            <div class="series-card">Seri 4</div>
-            <div class="series-card">Seri 5</div>
-            <div class="series-card">Seri 6</div>
-        </div>
-    </div>
-
+<script src="script.js"></script>
 </body>
 </html>
