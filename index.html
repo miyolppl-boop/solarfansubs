@@ -3,24 +3,221 @@
 <head>
 <meta charset="UTF-8">
 <title>SolarFansub</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="css/style.css">
+
+<style>
+body{margin:0;font-family:Arial;background:#0b0b0b;color:#f5f5dc}
+header{background:#000;padding:15px;display:flex;justify-content:space-between;align-items:center}
+header h1{color:#f5d76e;margin:0;cursor:pointer}
+input,textarea,button{padding:8px;border-radius:6px;border:none;width:100%}
+button{background:#f5d76e;font-weight:bold;cursor:pointer}
+.container{padding:20px}
+.section{border-bottom:2px solid #f5d76e;margin:15px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:15px}
+.card{background:#111;border-radius:8px;overflow:hidden;cursor:pointer}
+.card img{width:100%}
+.card h3{padding:10px;font-size:14px}
+.hidden{display:none}
+.chapter{background:#111;padding:10px;border-radius:6px;margin-bottom:8px;cursor:pointer}
+.reader img{width:100%;margin-bottom:10px}
+.panel{background:#111;padding:15px;border-radius:8px;margin-bottom:20px}
+.nav{display:flex;gap:10px;margin:10px 0}
+</style>
 </head>
+
 <body>
 
-<header class="topbar">
-    <img src="img/logo.png" class="logo">
-    <input type="text" id="search" placeholder="Seri ara...">
+<header>
+<h1 onclick="goHome()">SolarFansub</h1>
+<input id="search" placeholder="Seri ara..." onkeyup="searchSeries()">
 </header>
 
-<div id="seriesGrid" class="grid"></div>
+<!-- ADMIN LOGIN -->
+<div id="loginBox" class="container panel">
+<h3>Admin Girişi</h3>
+<input id="adminPass" type="password" placeholder="Admin şifresi">
+<br><br>
+<button onclick="login()">Giriş</button>
+<p id="loginMsg"></p>
+</div>
 
-<script src="js/data.js"></script>
-<script src="js/main.js"></script>
+<!-- ADMIN PANEL -->
+<div id="adminPanel" class="container panel hidden">
+<h3>Admin Panel</h3>
+<input id="title" placeholder="Seri adı">
+<br><br>
+<textarea id="desc" placeholder="Seri konusu"></textarea>
+<br><br>
+<input id="cover" placeholder="Kapak resim linki">
+<br><br>
+<button onclick="addSeries()">Seri Ekle</button>
+</div>
+
+<!-- ANA SAYFA -->
+<div id="home" class="container">
+<h2 class="section">SERİLER</h2>
+<div id="seriesList" class="grid"></div>
+<p id="empty">Henüz seri eklenmedi.</p>
+</div>
+
+<!-- SERİ SAYFASI -->
+<div id="seriesPage" class="container hidden">
+<button onclick="goHome()">⬅ Geri</button>
+<h2 id="sTitle"></h2>
+<img id="sCover" style="width:200px;border-radius:8px">
+<p id="sDesc"></p>
+
+<h3 class="section">BÖLÜMLER</h3>
+<div id="chapterList"></div>
+
+<div id="chapterAdd" class="panel hidden">
+<input id="newChapter" placeholder="Bölüm numarası">
+<br><br>
+<button onclick="addChapter()">Bölüm Ekle</button>
+</div>
+</div>
+
+<!-- OKUYUCU -->
+<div id="reader" class="container hidden reader">
+<button onclick="backToSeries()">⬅ Geri</button>
+<h2 id="chapterTitle"></h2>
+
+<div class="nav">
+<button onclick="prevChapter()">⬅ Önceki</button>
+<button onclick="nextChapter()">Sonraki ➡</button>
+</div>
+
+<div id="pages"></div>
+
+<h3 class="section">YORUMLAR</h3>
+<div id="disqus_thread"></div>
+</div>
+
+<script>
+/* 👑 ÇOKLU ADMİN ŞİFRELERİ */
+const ADMIN_PASSWORDS = ["admin123","solarfansub","alamuzpulum"]; // BURAYA EKLE
+
+let isAdmin=false;
+let seriesData=JSON.parse(localStorage.getItem("seriesData"))||[];
+let currentSeries=null;
+let currentChapter=null;
+
+/* LOGIN */
+function login(){
+if(ADMIN_PASSWORDS.includes(adminPass.value)){
+isAdmin=true;
+loginBox.classList.add("hidden");
+adminPanel.classList.remove("hidden");
+alert("Admin girişi başarılı");
+}else loginMsg.innerText="Şifre yanlış";
+}
+
+/* HOME */
+function goHome(){
+seriesPage.classList.add("hidden");
+reader.classList.add("hidden");
+home.classList.remove("hidden");
+loadSeries();
+}
+
+/* SERİ EKLE */
+function addSeries(){
+let s={id:Date.now().toString(),title:title.value,desc:desc.value,cover:cover.value,chapters:[]};
+seriesData.push(s);
+save();
+title.value=desc.value=cover.value="";
+loadSeries();
+}
+
+/* SERİLER */
+function loadSeries(){
+seriesList.innerHTML="";
+empty.style.display=seriesData.length?"none":"block";
+seriesData.forEach(s=>{
+let d=document.createElement("div");
+d.className="card";
+d.innerHTML=`<img src="${s.cover}"><h3>${s.title}</h3>`;
+d.onclick=()=>openSeries(s);
+seriesList.appendChild(d);
+});
+}
+
+/* ARAMA */
+function searchSeries(){
+let v=search.value.toLowerCase();
+document.querySelectorAll(".card").forEach(c=>{
+c.style.display=c.innerText.toLowerCase().includes(v)?"block":"none";
+});
+}
+
+/* SERİ AÇ */
+function openSeries(s){
+currentSeries=s;
+home.classList.add("hidden");
+seriesPage.classList.remove("hidden");
+sTitle.innerText=s.title;
+sCover.src=s.cover;
+sDesc.innerText=s.desc;
+chapterList.innerHTML="";
+s.chapters.forEach(c=>{
+chapterList.innerHTML+=`<div class="chapter" onclick="openChapter(${c})">Bölüm ${c}</div>`;
+});
+chapterAdd.classList.toggle("hidden",!isAdmin);
+}
+
+/* BÖLÜM EKLE */
+function addChapter(){
+currentSeries.chapters.push(Number(newChapter.value));
+currentSeries.chapters.sort((a,b)=>a-b);
+newChapter.value="";
+save();
+openSeries(currentSeries);
+}
+
+/* OKUYUCU */
+function openChapter(n){
+currentChapter=n;
+seriesPage.classList.add("hidden");
+reader.classList.remove("hidden");
+chapterTitle.innerText=currentSeries.title+" - Bölüm "+n;
+pages.innerHTML="";
+for(let i=1;i<=5;i++){
+pages.innerHTML+=`<img src="https://via.placeholder.com/800x1200?text=Sayfa+${i}">`;
+}
+loadDisqus(currentSeries.id+"-"+n);
+}
+function prevChapter(){
+let i=currentSeries.chapters.indexOf(currentChapter);
+if(i>0)openChapter(currentSeries.chapters[i-1]);
+}
+function nextChapter(){
+let i=currentSeries.chapters.indexOf(currentChapter);
+if(i<currentSeries.chapters.length-1)openChapter(currentSeries.chapters[i+1]);
+}
+function backToSeries(){
+reader.classList.add("hidden");
+seriesPage.classList.remove("hidden");
+}
+
+/* DISQUS */
+function loadDisqus(id){
+disqus_thread.innerHTML="";
+window.disqus_config=function(){
+this.page.url=window.location.href;
+this.page.identifier=id;
+};
+let d=document,s=d.createElement("script");
+s.src="https://SENIN-SHORTNAME.disqus.com/embed.js";
+s.setAttribute("data-timestamp",+new Date());
+(d.head||d.body).appendChild(s);
+}
+
+/* SAVE */
+function save(){
+localStorage.setItem("seriesData",JSON.stringify(seriesData));
+}
+
+loadSeries();
+</script>
+
 </body>
 </html>
-<header class="topbar">
-    <img src="img/logo.png" class="logo">
-    <input type="text" id="search" placeholder="Seri ara...">
-    <button id="themeBtn">🌙</button>
-</header>
