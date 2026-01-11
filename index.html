@@ -89,6 +89,15 @@ header h1{color:#f5d76e;margin:0;font-size:20px;cursor:pointer}
  cursor:pointer
 }
 .profile-box input{display:none}
+
+/* SERİLER */
+#series{
+ padding:20px;
+}
+#series h2{
+ border-bottom:2px solid #f5d76e;
+ padding-bottom:5px;
+}
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -104,6 +113,12 @@ header h1{color:#f5d76e;margin:0;font-size:20px;cursor:pointer}
  <input id="search" placeholder="Seri ara...">
  <div class="menu-btn" onclick="toggleMenu()">☰</div>
 </header>
+
+<!-- SERİLER -->
+<div id="series">
+ <h2>SERİLER</h2>
+ <p>Henüz seri yok.</p>
+</div>
 
 <!-- SAĞ MENÜ -->
 <div id="menu">
@@ -123,8 +138,8 @@ header h1{color:#f5d76e;margin:0;font-size:20px;cursor:pointer}
   </div>
 
   <h3>Yönetim</h3>
-  <div class="menu-item" onclick="openAdmin()">👤 Admin Panel</div>
-  <div class="menu-item" onclick="openAdmin()">➕ Seri Ekle</div>
+  <div class="menu-item">👤 Admin Panel</div>
+  <div class="menu-item">➕ Seri Ekle</div>
   <div class="menu-item" onclick="logout()">🚪 Çıkış</div>
  </div>
 
@@ -178,7 +193,6 @@ function loadAvatar(){
  const a=localStorage.getItem("adminAvatar");
  if(a)adminAvatar.src=a;
 }
-function openAdmin(){menu.classList.remove("active")}
 function goHome(){}
 </script>
 
