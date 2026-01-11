@@ -35,3 +35,19 @@ if (themeBtn) {
     );
   };
 }
+// === SEARCH ===
+const search = document.getElementById("search");
+if (search && grid) {
+  search.addEventListener("input", () => {
+    grid.innerHTML = "";
+    for (let k in data) {
+      if (data[k].title.toLowerCase().includes(search.value.toLowerCase())) {
+        const d = document.createElement("div");
+        d.className = "card";
+        d.innerHTML = data[k].title;
+        d.onclick = () => location.href = `series.html?id=${k}`;
+        grid.appendChild(d);
+      }
+    }
+  });
+}
