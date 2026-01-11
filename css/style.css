@@ -1,86 +1,43 @@
-* {
-    box-sizing: border-box;
-}
-
 body {
-    margin: 0;
-    background: #000;
-    color: #fff4b0;
-    font-family: Arial, sans-serif;
-    overflow-x: hidden;
+  margin:0;
+  background:#000;
+  color:#fff4b0;
+  font-family:Arial;
 }
-
-/* ÜST BAR */
 .topbar {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
-    border-bottom: 2px solid #fff4b0;
+  display:flex;
+  padding:10px;
+  border-bottom:2px solid #fff4b0;
 }
-
-.logo {
-    height: 36px;
+.logo { height:40px }
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,150px);
+  gap:15px;
+  padding:20px;
 }
-
-#searchInput {
-    flex: 1;
-    padding: 8px 14px;
-    border-radius: 20px;
-    border: none;
-    outline: none;
+.card {
+  background:#111;
+  padding:20px;
+  border-radius:10px;
+  cursor:pointer;
+  text-align:center;
 }
-
-.menu {
-    font-size: 26px;
-}
-
-/* DUYURU */
-.announcement {
-    margin: 20px;
-    padding: 20px;
-    border: 2px solid #fff4b0;
-    border-radius: 15px;
-}
-
-/* SERİLER */
-.series {
-    margin: 20px;
-}
-
-.series-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 15px;
-}
-
-.series-card {
-    background: #111;
-    padding: 20px;
-    border-radius: 12px;
-    text-align: center;
-    position: relative;
-}
-
-/* NEW ETİKETİ */
-.new-badge {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background: red;
-    color: white;
-    font-size: 12px;
-    padding: 4px 7px;
-    border-radius: 6px;
-    animation: pulse 1s infinite;
-}
-
-@keyframes pulse {
-    0% { box-shadow: 0 0 5px red; }
-    50% { box-shadow: 0 0 15px red; }
-    100% { box-shadow: 0 0 5px red; }
-}
-
-#noSeries {
-    margin-top: 15px;
-}
+img { width:100%; display:block }
+.nav { text-align:center; margin:20px }
+button { padding:10px 20px }
+/ (root)
+│── index.html
+│── series.html
+│── chapter.html
+│
+├── css/
+│   └── style.css
+│
+├── js/
+│   ├── data.js
+│   ├── main.js
+│   └── reader.js
+│
+└── img/
+    └── logo.png
