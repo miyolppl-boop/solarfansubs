@@ -4,15 +4,15 @@
 <meta charset="UTF-8">
 <title>SolarFansub</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial;background:#0c0c0c;color:#eee}
 header{background:#000;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
 .logo{color:#f5d76e;font-size:20px;font-weight:bold;cursor:pointer}
-input,textarea,button{padding:8px;border-radius:6px;border:none;width:100%;margin:4px 0}
+input,textarea,button,select{padding:8px;border-radius:6px;border:none;width:100%;margin:4px 0}
 button{background:#f5d76e;color:#000;cursor:pointer}
 .container{padding:16px}
+.section-title{font-size:20px;color:#f5d76e;border-bottom:2px solid #f5d76e;margin:25px 0 10px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:15px}
 .card{background:#151515;border-radius:8px;padding:10px;text-align:center;cursor:pointer}
 .card img{width:100%;height:230px;object-fit:cover;border-radius:6px}
@@ -20,9 +20,9 @@ button{background:#f5d76e;color:#000;cursor:pointer}
 .star{font-size:22px;color:#444;cursor:pointer}
 .star.active{color:#f5d76e}
 .chapter{background:#1f1f1f;padding:10px;border-radius:6px;margin:6px 0;cursor:pointer}
+.new{color:#0f0;font-size:12px;margin-left:6px}
 .reader img{width:100%;margin-bottom:10px}
 .admin-box{position:fixed;right:10px;bottom:10px;background:#111;padding:10px;border-radius:8px;width:260px}
-.admin-panel{background:#111;padding:15px;border-radius:8px;margin-top:10px}
 </style>
 </head>
 
@@ -37,20 +37,22 @@ button{background:#f5d76e;color:#000;cursor:pointer}
 <div id="detail" class="container hidden"></div>
 <div id="reader" class="container hidden reader"></div>
 
-<!-- ADMIN LOGIN -->
 <div class="admin-box" id="adminLoginBox">
 <input id="adminPass" type="password" placeholder="Admin şifre">
 <button onclick="adminLogin()">Admin Giriş</button>
 </div>
 
-<!-- ADMIN PANEL -->
 <div class="container hidden" id="adminPanel">
 <h2>Admin Paneli</h2>
 
 <input id="sTitle" placeholder="Seri adı">
-<input id="sCoverFile" type="file" accept="image/*">
+<input id="sCover" type="file" accept="image/*">
 <textarea id="sDesc" placeholder="Açıklama"></textarea>
 <input id="sGenres" placeholder="Türler (virgülle)">
+<select id="sStatus">
+<option>Devam Ediyor</option>
+<option>Bitti</option>
+</select>
 <button onclick="addSeries()">➕ Seri Ekle</button>
 
 <hr>
@@ -64,11 +66,12 @@ button{background:#f5d76e;color:#000;cursor:pointer}
 </div>
 
 <script>
-const ADMIN_PASSWORD="alamuzpulums&129qam";
-let isAdmin=false;
+const ADMIN_PASSWORDS=["alamuzpulums&129qam","admin2"];
+let data=JSON.parse(localStorage.getItem("DATA"))||{series:[]};
+let favs=JSON.parse(localStorage.getItem("FAVS"))||[];
 
-let data=JSON.parse(localStorage.getItem("DATA")) || { series:[] };
-function save(){localStorage.setItem("DATA",JSON.stringify(data));}
+function save(){localStorage.setItem("DATA",JSON.stringify(data))}
+function avg(s){return s.rating.length? s.rating.reduce((a,b)=>a+b,0)/s.rating.length:0}
 
 function goHome(){
 detail.classList.add("hidden");
@@ -79,108 +82,102 @@ renderSeries();
 
 function renderSeries(){
 home.innerHTML="";
-const q=search.value.toLowerCase();
-home.innerHTML=`<div class="grid">${
-data.series.filter(s=>s.title.toLowerCase().includes(q))
-.map(s=>`
-<div class="card" onclick="openSeries(${s.id})">
+let now=Date.now();
+
+let weekPopular=[...data.series].sort((a,b)=>b.views-a.views)[0];
+let mostRead=[...data.series].sort((a,b)=>b.views-a.views).slice(0,6);
+let popular=[...data.series].sort((a,b)=>avg(b)-avg(a)).slice(0,6);
+let others=[...data.series].filter(s=>!popular.includes(s));
+
+let html="";
+
+if(weekPopular){
+html+=`<div class="section-title">🔥 Haftanın Popüleri</div><div class="grid">${card(weekPopular)}</div>`;
+}
+
+html+=`<div class="section-title">👁 En Çok Okunanlar</div><div class="grid">${mostRead.map(card).join("")}</div>`;
+html+=`<div class="section-title">⭐ Popüler Seriler</div><div class="grid">${popular.map(card).join("")}</div>`;
+html+=`<div class="section-title">📚 Diğer Seriler</div><div class="grid">${others.map(card).join("")}</div>`;
+
+home.innerHTML=html;
+}
+
+function card(s){
+return `<div class="card" onclick="openSeries(${s.id})">
 <img src="${s.cover}">
 <b>${s.title}</b>
-</div>`).join("")
-}</div>`;
+</div>`;
 }
 
 function openSeries(id){
 const s=data.series.find(x=>x.id===id);
 s.views++; save();
-
 home.classList.add("hidden");
 detail.classList.remove("hidden");
 
-const avg=s.rating.length?(s.rating.reduce((a,b)=>a+b,0)/s.rating.length).toFixed(1):"0";
-
 detail.innerHTML=`
 <h2>${s.title}</h2>
-<img src="${s.cover}" style="max-width:250px">
+<img src="${s.cover}" style="max-width:240px">
 <p>${s.desc}</p>
 <p><b>Türler:</b> ${s.genres.join(", ")}</p>
-<p><b>Görüntülenme:</b> ${s.views}</p>
+<p><b>Durum:</b> ${s.status}</p>
+<p><b>Favori:</b> ${favs.filter(f=>f===id).length}</p>
 
-<div>
-${[1,2,3,4,5].map(i=>`<span class="star ${avg>=i?'active':''}" onclick="rate(${id},${i})">★</span>`).join("")}
-<b>${avg}</b>
-</div>
+<button onclick="toggleFav(${id})">⭐ Takip Et</button>
 
 <h3>Bölümler</h3>
 ${s.chapters.map(c=>`
 <div class="chapter" onclick="openChapter(${id},${c.id})">
-${c.title} (${c.views})
+${c.title} ${Date.now()-c.created<86400000?'<span class="new">NEW</span>':''}
 </div>`).join("")}
-
-<div id="disqus_thread"></div>
 `;
-loadDisqus(id);
 }
 
-function rate(id,val){
-const s=data.series.find(x=>x.id===id);
-s.rating.push(val);
-save();
-openSeries(id);
+function toggleFav(id){
+if(!favs.includes(id)) favs.push(id);
+localStorage.setItem("FAVS",JSON.stringify(favs));
+alert("Favorilere eklendi");
 }
 
 function openChapter(sid,cid){
 const s=data.series.find(x=>x.id===sid);
 const c=s.chapters.find(x=>x.id===cid);
-c.views++; save();
-
 detail.classList.add("hidden");
 reader.classList.remove("hidden");
 reader.innerHTML=c.pages.map(p=>`<img src="${p}">`).join("");
 }
 
 function adminLogin(){
-if(adminPass.value===ADMIN_PASSWORD){
-isAdmin=true;
+if(ADMIN_PASSWORDS.includes(adminPass.value)){
 adminLoginBox.classList.add("hidden");
 adminPanel.classList.remove("hidden");
 updateSeriesSelect();
-alert("Admin modu aktif");
 }else alert("Hatalı şifre");
 }
 
 function logout(){
-isAdmin=false;
 adminPanel.classList.add("hidden");
 adminLoginBox.classList.remove("hidden");
 }
 
 function addSeries(){
-const file=document.getElementById("sCoverFile").files[0];
-if(!file) return alert("Kapak seç");
-
-const reader=new FileReader();
-reader.onload=function(e){
-const s={
+const file=sCover.files[0];
+const r=new FileReader();
+r.onload=e=>{
+data.series.push({
 id:Date.now(),
 title:sTitle.value,
 cover:e.target.result,
 desc:sDesc.value,
 genres:sGenres.value.split(","),
+status:sStatus.value,
 rating:[],
 views:0,
 chapters:[]
+});
+save(); renderSeries(); updateSeriesSelect();
 };
-data.series.push(s);
-save();
-updateSeriesSelect();
-renderSeries();
-};
-reader.readAsDataURL(file);
-}
-
-function updateSeriesSelect(){
-seriesSelect.innerHTML=data.series.map(s=>`<option value="${s.id}">${s.title}</option>`).join("");
+r.readAsDataURL(file);
 }
 
 function addChapter(){
@@ -189,18 +186,13 @@ s.chapters.push({
 id:Date.now(),
 title:cTitle.value,
 pages:cPages.value.split("\n"),
-views:0
+created:Date.now()
 });
-save();
-alert("Bölüm eklendi");
+save(); alert("Bölüm eklendi");
 }
 
-function loadDisqus(id){
-window.disqus_config=function(){this.page.identifier=id;}
-let d=document,s=d.createElement("script");
-s.src="https://YOUR_SHORTNAME.disqus.com/embed.js";
-s.setAttribute("data-timestamp",+new Date());
-(d.head||d.body).appendChild(s);
+function updateSeriesSelect(){
+seriesSelect.innerHTML=data.series.map(s=>`<option value="${s.id}">${s.title}</option>`).join("");
 }
 
 renderSeries();
