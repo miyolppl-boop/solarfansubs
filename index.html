@@ -10,17 +10,14 @@
 <meta name="author" content="SolarFansub">
 <meta name="robots" content="index, follow">
 
-<!-- 🔹 SITE LOGO / FAVICON -->
+<!-- SITE LOGO -->
 <link rel="icon" href="logo.png" type="image/png">
 <link rel="apple-touch-icon" href="logo.png">
 
-<!-- 🔹 SOSYAL PAYLAŞIM LOGOSU -->
 <meta property="og:title" content="SolarFansub">
 <meta property="og:description" content="Türkçe manhwa ve manga okuma sitesi">
 <meta property="og:type" content="website">
 <meta property="og:image" content="logo.png">
-<meta property="og:image:width" content="512">
-<meta property="og:image:height" content="512">
 
 <style>
 body{margin:0;font-family:Arial;background:#0b0b0b;color:#f5f5dc}
@@ -32,7 +29,9 @@ header{
  display:flex;
  align-items:center;
  justify-content:space-between;
- gap:10px
+ gap:10px;
+ position:relative;
+ z-index:1000;
 }
 header h1{color:#f5d76e;margin:0;font-size:20px;cursor:pointer}
 
@@ -40,17 +39,33 @@ header h1{color:#f5d76e;margin:0;font-size:20px;cursor:pointer}
 #search{max-width:220px;padding:6px 10px;font-size:14px}
 
 /* HAMBURGER */
-.menu-btn{font-size:22px;color:#f5d76e;cursor:pointer}
+.menu-btn{
+ font-size:22px;
+ color:#f5d76e;
+ cursor:pointer;
+ position:relative;
+ z-index:1001;
+}
 
 /* MENU */
 #menu{
- position:fixed;top:0;right:-260px;
- width:260px;height:100%;
- background:#111;padding:20px;
- transition:.3s;z-index:999
+ position:fixed;
+ top:0;
+ right:-260px;
+ width:260px;
+ height:100%;
+ background:#111;
+ padding:25px 20px;
+ transition:.3s;
+ z-index:999;
+ box-sizing:border-box;
 }
 #menu.active{right:0}
-#menu h3{margin-top:0}
+#menu h3{
+ margin-top:0;
+ margin-bottom:10px;
+ text-align:center;
+}
 
 /* ADMIN MENU */
 .menu-item{
@@ -128,7 +143,9 @@ firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth();
 const storage=firebase.storage();
 
-function toggleMenu(){menu.classList.toggle("active")}
+function toggleMenu(){
+ document.getElementById("menu").classList.toggle("active");
+}
 
 auth.onAuthStateChanged(u=>{
  if(u){
