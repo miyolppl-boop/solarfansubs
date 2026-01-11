@@ -3,30 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <title>SolarFansub</title>
-
 <meta name="description" content="SolarFansub - Türkçe manhwa ve manga okuma sitesi.">
-<meta name="robots" content="index, follow">
 <link rel="icon" href="logo.png">
 
 <style>
 body{margin:0;font-family:Arial;background:#0b0b0b;color:#f5f5dc}
 header{background:#000;padding:10px 15px;display:flex;justify-content:space-between;align-items:center}
-h1{color:#f5d76e;font-size:20px;margin:0}
+h1{color:#f5d76e;font-size:20px;margin:0;cursor:pointer}
 .menu-btn{font-size:22px;color:#f5d76e;cursor:pointer}
 #menu{position:fixed;right:-260px;top:0;width:260px;height:100%;background:#111;padding:20px;transition:.3s}
 #menu.active{right:0}
-.menu-item{background:#1a1a1a;margin:6px 0;padding:10px;border-radius:6px;cursor:pointer}
 .hidden{display:none}
-#series,#reader{padding:20px}
-.series-card{background:#151515;padding:10px;margin:10px 0;border-radius:6px}
-.chapter{padding:6px;margin-top:5px;background:#222;border-radius:4px;cursor:pointer}
-.new{color:#0f0;font-size:12px;margin-left:5px}
-.read{color:#888;font-size:12px;margin-left:5px}
+#series,#reader,#detail{padding:20px}
+.series-card{background:#151515;padding:10px;margin:10px 0;border-radius:6px;cursor:pointer}
+.chapter{background:#222;padding:8px;margin-top:5px;border-radius:4px;cursor:pointer}
 .page{width:100%;margin-bottom:10px}
-.admin-btn{color:#f55;font-size:12px;margin-left:8px;cursor:pointer}
-.like{color:#f5d76e;font-size:14px;margin-left:10px;cursor:pointer}
-.count{font-size:12px;color:#aaa;margin-left:5px}
-input,textarea,button{width:100%;margin-top:5px}
+.star{font-size:24px;cursor:pointer;color:#555}
+.star.active{color:#f5d76e}
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -38,10 +31,11 @@ input,textarea,button{width:100%;margin-top:5px}
 
 <header>
 <h1 onclick="goHome()">SolarFansub</h1>
-<div class="menu-btn" onclick="toggleMenu()">☰</div>
+<div class="menu-btn" onclick="menu.classList.toggle('active')">☰</div>
 </header>
 
 <div id="series"></div>
+<div id="detail" class="hidden"></div>
 <div id="reader" class="hidden"></div>
 
 <div id="menu">
@@ -56,13 +50,10 @@ input,textarea,button{width:100%;margin-top:5px}
 <h3>Yönetim</h3>
 <input id="newSeries" placeholder="Yeni Seri">
 <button onclick="addSeries()">➕ Seri Ekle</button>
-
 <hr>
-<select id="seriesSelect"></select>
-<input id="chapterTitle" placeholder="Bölüm Adı">
-<textarea id="pages" placeholder="Sayfa URL’leri (her satır bir resim)"></textarea>
-<button onclick="addChapter()">📚 Bölüm Ekle</button>
-
+<input id="oldPass" type="password" placeholder="Eski Şifre">
+<input id="newPass" type="password" placeholder="Yeni Şifre">
+<button onclick="changePass()">🔐 Şifre Değiştir</button>
 <button onclick="logout()">🚪 Çıkış</button>
 </div>
 </div>
@@ -74,115 +65,110 @@ const firebaseConfig={
  projectId:"BURAYA"
 };
 firebase.initializeApp(firebaseConfig);
-
 const auth=firebase.auth();
 const db=firebase.firestore();
 
-const seriesDiv=document.getElementById("series");
-const reader=document.getElementById("reader");
-
-function toggleMenu(){menu.classList.toggle("active")}
-function goHome(){reader.classList.add("hidden");seriesDiv.classList.remove("hidden")}
+const seriesDiv=series;
+const detailDiv=detail;
+const readerDiv=reader;
 
 auth.onAuthStateChanged(u=>{
- if(u){loginBox.classList.add("hidden");adminMenu.classList.remove("hidden")}
- else{loginBox.classList.remove("hidden");adminMenu.classList.add("hidden")}
+ loginBox.classList.toggle("hidden",!!u);
+ adminMenu.classList.toggle("hidden",!u);
 });
 
 function login(){
  auth.signInWithEmailAndPassword(email.value,password.value)
- .catch(()=>alert("Hatalı giriş"))
+ .catch(()=>alert("Hatalı giriş"));
 }
 function logout(){auth.signOut()}
-
-function addSeries(){
- db.collection("series").add({title:newSeries.value,created:Date.now()});
- newSeries.value="";
- loadSeries();
+function changePass(){
+ auth.currentUser.updatePassword(newPass.value)
+ .then(()=>alert("Şifre değişti"))
 }
 
-function addChapter(){
- const pagesArr=pages.value.split("\n");
- db.collection("series").doc(seriesSelect.value)
- .collection("chapters").add({
-  title:chapterTitle.value,
-  pages:pagesArr,
-  created:Date.now(),
-  views:0,
-  likes:[]
- });
- chapterTitle.value="";pages.value="";
+function addSeries(){
+ db.collection("series").add({title:newSeries.value,rate:[],created:Date.now()});
+ newSeries.value="";loadSeries();
 }
 
 function loadSeries(){
  seriesDiv.innerHTML="";
- seriesSelect.innerHTML="";
- db.collection("series").get().then(snap=>{
-  snap.forEach(doc=>{
-   seriesSelect.innerHTML+=`<option value="${doc.id}">${doc.data().title}</option>`;
-   const s=document.createElement("div");
-   s.className="series-card";
-   s.innerHTML=`<b>${doc.data().title}</b>`;
-   s.onclick=()=>loadChapters(doc.id);
-   seriesDiv.appendChild(s);
+ db.collection("series").get().then(s=>{
+  s.forEach(d=>{
+   const c=document.createElement("div");
+   c.className="series-card";
+   c.innerText=d.data().title;
+   c.onclick=()=>openSeries(d.id,d.data());
+   seriesDiv.appendChild(c);
   });
  });
 }
 
-function loadChapters(id){
- seriesDiv.innerHTML="";
- db.collection("series").doc(id).collection("chapters")
- .orderBy("created","desc").get().then(snap=>{
-  snap.forEach(c=>{
-   const d=c.data();
+function openSeries(id,data){
+ seriesDiv.classList.add("hidden");
+ detailDiv.classList.remove("hidden");
+ detailDiv.innerHTML=`
+ <h2 style="text-align:center">${data.title}</h2>
+ <div id="stars" style="text-align:center"></div>
+ <p style="text-align:center">Ortalama: ${avg(data.rate||[])} / 5</p>
+ <hr>
+ <div id="chapters"></div>
+ `;
+ for(let i=1;i<=5;i++){
+  const s=document.createElement("span");
+  s.className="star";
+  s.innerText="★";
+  s.onclick=()=>rate(id,i);
+  stars.appendChild(s);
+ }
+ db.collection("series").doc(id).collection("chapters").get().then(cs=>{
+  cs.forEach(c=>{
    const ch=document.createElement("div");
    ch.className="chapter";
-   ch.innerHTML=`
-    <b contenteditable="${!!auth.currentUser}" 
-    onblur="editTitle('${id}','${c.id}',this.innerText)">
-    ${d.title}</b>
-    <span class="count">👁 ${d.views||0}</span>
-    <span class="like" onclick="like('${id}','${c.id}')">⭐ ${d.likes?.length||0}</span>
-    ${auth.currentUser?`<span class="admin-btn" onclick="del('${id}','${c.id}')">🗑️</span>`:""}
-   `;
+   ch.innerText=c.data().title;
    ch.onclick=()=>openChapter(id,c.id);
-   seriesDiv.appendChild(ch);
+   chapters.appendChild(ch);
   });
  });
 }
 
-function editTitle(s,c,t){
- db.collection("series").doc(s).collection("chapters").doc(c).update({title:t});
-}
-
-function del(s,c){
- if(confirm("Silinsin mi?")){
-  db.collection("series").doc(s).collection("chapters").doc(c).delete();
-  loadSeries();
- }
-}
-
-function like(s,c){
+function rate(id,v){
  if(!auth.currentUser)return alert("Giriş yap");
- const ref=db.collection("series").doc(s).collection("chapters").doc(c);
+ const ref=db.collection("series").doc(id);
  ref.get().then(d=>{
-  const likes=d.data().likes||[];
-  if(!likes.includes(auth.currentUser.uid)){
-   ref.update({likes:[...likes,auth.currentUser.uid]});
-  }
+  const r=d.data().rate||[];
+  ref.update({rate:[...r,v]});
  });
 }
+
+function avg(a){return a.length?(a.reduce((x,y)=>x+y,0)/a.length).toFixed(1):"0"}
 
 function openChapter(s,c){
- reader.innerHTML="";reader.classList.remove("hidden");seriesDiv.classList.add("hidden");
+ detailDiv.classList.add("hidden");
+ readerDiv.classList.remove("hidden");
+ readerDiv.innerHTML="";
  const ref=db.collection("series").doc(s).collection("chapters").doc(c);
- ref.update({views:firebase.firestore.FieldValue.increment(1)});
  ref.get().then(d=>{
   d.data().pages.forEach(p=>{
-   const img=document.createElement("img");
-   img.src=p;img.className="page";reader.appendChild(img);
+   const i=document.createElement("img");
+   i.src=p;i.className="page";
+   readerDiv.appendChild(i);
   });
+  readerDiv.innerHTML+=`
+  <div id="disqus_thread"></div>
+  `;
+  var d=document,scr=d.createElement("script");
+  scr.src="https://DISQUS_SHORTNAME.disqus.com/embed.js";
+  scr.setAttribute("data-timestamp",+new Date());
+  d.body.appendChild(scr);
  });
+}
+
+function goHome(){
+ detailDiv.classList.add("hidden");
+ readerDiv.classList.add("hidden");
+ seriesDiv.classList.remove("hidden");
 }
 
 loadSeries();
