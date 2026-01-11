@@ -4,12 +4,13 @@
 <meta charset="UTF-8">
 <title>SolarFansub</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial;background:#0c0c0c;color:#eee}
 header{background:#000;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
 .logo{color:#f5d76e;font-size:20px;font-weight:bold}
-input,button{padding:8px;border-radius:6px;border:none}
+input,textarea,button{padding:8px;border-radius:6px;border:none;width:100%;margin:4px 0}
 button{background:#f5d76e;color:#000;cursor:pointer}
 .container{padding:16px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:15px}
@@ -20,14 +21,15 @@ button{background:#f5d76e;color:#000;cursor:pointer}
 .star.active{color:#f5d76e}
 .chapter{background:#1f1f1f;padding:10px;border-radius:6px;margin:6px 0;cursor:pointer}
 .reader img{width:100%;margin-bottom:10px}
-.admin{position:fixed;right:10px;bottom:10px;background:#111;padding:10px;border-radius:8px}
+.admin-box{position:fixed;right:10px;bottom:10px;background:#111;padding:10px;border-radius:8px;width:260px}
+.admin-panel{background:#111;padding:15px;border-radius:8px;margin-top:10px}
 </style>
 </head>
 
 <body>
 
 <header>
-<div class="logo">SolarFansub</div>
+<div class="logo" onclick="goHome()">SolarFansub</div>
 <input id="search" placeholder="Seri ara..." oninput="renderSeries()">
 </header>
 
@@ -35,52 +37,53 @@ button{background:#f5d76e;color:#000;cursor:pointer}
 <div id="detail" class="container hidden"></div>
 <div id="reader" class="container hidden reader"></div>
 
-<div class="admin">
+<!-- ADMIN LOGIN -->
+<div class="admin-box" id="adminLoginBox">
 <input id="adminPass" type="password" placeholder="Admin şifre">
-<button onclick="adminLogin()">Giriş</button>
+<button onclick="adminLogin()">Admin Giriş</button>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="container hidden" id="adminPanel">
+<h2>Admin Paneli</h2>
+
+<input id="sTitle" placeholder="Seri adı">
+<input id="sCover" placeholder="Kapak URL">
+<textarea id="sDesc" placeholder="Açıklama"></textarea>
+<input id="sGenres" placeholder="Türler (virgülle)">
+<button onclick="addSeries()">➕ Seri Ekle</button>
+
+<hr>
+
+<select id="seriesSelect"></select>
+<input id="cTitle" placeholder="Bölüm adı">
+<textarea id="cPages" placeholder="Sayfa URL'leri (her satır 1 resim)"></textarea>
+<button onclick="addChapter()">📚 Bölüm Ekle</button>
+
+<button onclick="logout()">🚪 Admin Çıkış</button>
 </div>
 
 <script>
-const ADMIN_PASSWORD="123456";
-
-let data=JSON.parse(localStorage.getItem("DATA"))||{
-series:[
-{
-id:1,
-title:"Örnek Manwha",
-cover:"https://via.placeholder.com/300x450",
-desc:"Bu örnek bir manwha açıklamasıdır.",
-genres:["Action","Fantasy"],
-rating:[],
-views:0,
-chapters:[
-{
-id:1,
-title:"Bölüm 1",
-pages:[
-"https://via.placeholder.com/800x1200",
-"https://via.placeholder.com/800x1200"
-],
-views:0
-}
-]
-}
-]
-};
+const ADMIN_PASSWORD="alamuzpulums&129qam";
 
 let isAdmin=false;
 
+let data=JSON.parse(localStorage.getItem("DATA")) || { series:[] };
+
 function save(){localStorage.setItem("DATA",JSON.stringify(data));}
 
-function renderSeries(){
-home.classList.remove("hidden");
+function goHome(){
 detail.classList.add("hidden");
 reader.classList.add("hidden");
+home.classList.remove("hidden");
+renderSeries();
+}
 
+function renderSeries(){
+home.innerHTML="";
 const q=search.value.toLowerCase();
 home.innerHTML=`<div class="grid">${
-data.series
-.filter(s=>s.title.toLowerCase().includes(q))
+data.series.filter(s=>s.title.toLowerCase().includes(q))
 .map(s=>`
 <div class="card" onclick="openSeries(${s.id})">
 <img src="${s.cover}">
@@ -141,14 +144,54 @@ reader.innerHTML=c.pages.map(p=>`<img src="${p}">`).join("");
 function adminLogin(){
 if(adminPass.value===ADMIN_PASSWORD){
 isAdmin=true;
-alert("Admin girişi başarılı");
+adminLoginBox.classList.add("hidden");
+adminPanel.classList.remove("hidden");
+alert("Admin modu aktif");
+updateSeriesSelect();
 }else alert("Hatalı şifre");
 }
 
-function loadDisqus(id){
-window.disqus_config=function(){
-this.page.identifier=id;
+function logout(){
+isAdmin=false;
+adminPanel.classList.add("hidden");
+adminLoginBox.classList.remove("hidden");
+}
+
+function addSeries(){
+const s={
+id:Date.now(),
+title:sTitle.value,
+cover:sCover.value,
+desc:sDesc.value,
+genres:sGenres.value.split(","),
+rating:[],
+views:0,
+chapters:[]
 };
+data.series.push(s);
+save();
+updateSeriesSelect();
+renderSeries();
+}
+
+function updateSeriesSelect(){
+seriesSelect.innerHTML=data.series.map(s=>`<option value="${s.id}">${s.title}</option>`).join("");
+}
+
+function addChapter(){
+const s=data.series.find(x=>x.id==seriesSelect.value);
+s.chapters.push({
+id:Date.now(),
+title:cTitle.value,
+pages:cPages.value.split("\n"),
+views:0
+});
+save();
+alert("Bölüm eklendi");
+}
+
+function loadDisqus(id){
+window.disqus_config=function(){this.page.identifier=id;}
 let d=document,s=d.createElement("script");
 s.src="https://YOUR_SHORTNAME.disqus.com/embed.js";
 s.setAttribute("data-timestamp",+new Date());
