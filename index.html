@@ -3,175 +3,159 @@
 <head>
 <meta charset="UTF-8">
 <title>SolarFansub</title>
-<meta name="description" content="SolarFansub - Türkçe manhwa ve manga okuma sitesi.">
-<link rel="icon" href="logo.png">
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body{margin:0;font-family:Arial;background:#0b0b0b;color:#f5f5dc}
-header{background:#000;padding:10px 15px;display:flex;justify-content:space-between;align-items:center}
-h1{color:#f5d76e;font-size:20px;margin:0;cursor:pointer}
-.menu-btn{font-size:22px;color:#f5d76e;cursor:pointer}
-#menu{position:fixed;right:-260px;top:0;width:260px;height:100%;background:#111;padding:20px;transition:.3s}
-#menu.active{right:0}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial;background:#0c0c0c;color:#eee}
+header{background:#000;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+.logo{color:#f5d76e;font-size:20px;font-weight:bold}
+input,button{padding:8px;border-radius:6px;border:none}
+button{background:#f5d76e;color:#000;cursor:pointer}
+.container{padding:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:15px}
+.card{background:#151515;border-radius:8px;padding:10px;text-align:center;cursor:pointer}
+.card img{width:100%;height:230px;object-fit:cover;border-radius:6px}
 .hidden{display:none}
-#series,#reader,#detail{padding:20px}
-.series-card{background:#151515;padding:10px;margin:10px 0;border-radius:6px;cursor:pointer}
-.chapter{background:#222;padding:8px;margin-top:5px;border-radius:4px;cursor:pointer}
-.page{width:100%;margin-bottom:10px}
-.star{font-size:24px;cursor:pointer;color:#555}
+.star{font-size:22px;color:#444;cursor:pointer}
 .star.active{color:#f5d76e}
+.chapter{background:#1f1f1f;padding:10px;border-radius:6px;margin:6px 0;cursor:pointer}
+.reader img{width:100%;margin-bottom:10px}
+.admin{position:fixed;right:10px;bottom:10px;background:#111;padding:10px;border-radius:8px}
 </style>
-
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
 
 <body>
 
 <header>
-<h1 onclick="goHome()">SolarFansub</h1>
-<div class="menu-btn" onclick="menu.classList.toggle('active')">☰</div>
+<div class="logo">SolarFansub</div>
+<input id="search" placeholder="Seri ara..." oninput="renderSeries()">
 </header>
 
-<div id="series"></div>
-<div id="detail" class="hidden"></div>
-<div id="reader" class="hidden"></div>
+<div id="home" class="container"></div>
+<div id="detail" class="container hidden"></div>
+<div id="reader" class="container hidden reader"></div>
 
-<div id="menu">
-<div id="loginBox">
-<h3>Admin Girişi</h3>
-<input id="email" placeholder="E-mail">
-<input id="password" type="password" placeholder="Şifre">
-<button onclick="login()">Giriş</button>
-</div>
-
-<div id="adminMenu" class="hidden">
-<h3>Yönetim</h3>
-<input id="newSeries" placeholder="Yeni Seri">
-<button onclick="addSeries()">➕ Seri Ekle</button>
-<hr>
-<input id="oldPass" type="password" placeholder="Eski Şifre">
-<input id="newPass" type="password" placeholder="Yeni Şifre">
-<button onclick="changePass()">🔐 Şifre Değiştir</button>
-<button onclick="logout()">🚪 Çıkış</button>
-</div>
+<div class="admin">
+<input id="adminPass" type="password" placeholder="Admin şifre">
+<button onclick="adminLogin()">Giriş</button>
 </div>
 
 <script>
-const firebaseConfig={
- apiKey:"BURAYA",
- authDomain:"BURAYA",
- projectId:"BURAYA"
+const ADMIN_PASSWORD="123456";
+
+let data=JSON.parse(localStorage.getItem("DATA"))||{
+series:[
+{
+id:1,
+title:"Örnek Manwha",
+cover:"https://via.placeholder.com/300x450",
+desc:"Bu örnek bir manwha açıklamasıdır.",
+genres:["Action","Fantasy"],
+rating:[],
+views:0,
+chapters:[
+{
+id:1,
+title:"Bölüm 1",
+pages:[
+"https://via.placeholder.com/800x1200",
+"https://via.placeholder.com/800x1200"
+],
+views:0
+}
+]
+}
+]
 };
-firebase.initializeApp(firebaseConfig);
-const auth=firebase.auth();
-const db=firebase.firestore();
 
-const seriesDiv=series;
-const detailDiv=detail;
-const readerDiv=reader;
+let isAdmin=false;
 
-auth.onAuthStateChanged(u=>{
- loginBox.classList.toggle("hidden",!!u);
- adminMenu.classList.toggle("hidden",!u);
-});
+function save(){localStorage.setItem("DATA",JSON.stringify(data));}
 
-function login(){
- auth.signInWithEmailAndPassword(email.value,password.value)
- .catch(()=>alert("Hatalı giriş"));
-}
-function logout(){auth.signOut()}
-function changePass(){
- auth.currentUser.updatePassword(newPass.value)
- .then(()=>alert("Şifre değişti"))
-}
+function renderSeries(){
+home.classList.remove("hidden");
+detail.classList.add("hidden");
+reader.classList.add("hidden");
 
-function addSeries(){
- db.collection("series").add({title:newSeries.value,rate:[],created:Date.now()});
- newSeries.value="";loadSeries();
+const q=search.value.toLowerCase();
+home.innerHTML=`<div class="grid">${
+data.series
+.filter(s=>s.title.toLowerCase().includes(q))
+.map(s=>`
+<div class="card" onclick="openSeries(${s.id})">
+<img src="${s.cover}">
+<b>${s.title}</b>
+</div>`).join("")
+}</div>`;
 }
 
-function loadSeries(){
- seriesDiv.innerHTML="";
- db.collection("series").get().then(s=>{
-  s.forEach(d=>{
-   const c=document.createElement("div");
-   c.className="series-card";
-   c.innerText=d.data().title;
-   c.onclick=()=>openSeries(d.id,d.data());
-   seriesDiv.appendChild(c);
-  });
- });
+function openSeries(id){
+const s=data.series.find(x=>x.id===id);
+s.views++; save();
+
+home.classList.add("hidden");
+detail.classList.remove("hidden");
+
+const avg=s.rating.length?(s.rating.reduce((a,b)=>a+b,0)/s.rating.length).toFixed(1):"0";
+
+detail.innerHTML=`
+<h2>${s.title}</h2>
+<img src="${s.cover}" style="max-width:250px">
+<p>${s.desc}</p>
+<p><b>Türler:</b> ${s.genres.join(", ")}</p>
+<p><b>Görüntülenme:</b> ${s.views}</p>
+
+<div>
+${[1,2,3,4,5].map(i=>`<span class="star ${avg>=i?'active':''}" onclick="rate(${id},${i})">★</span>`).join("")}
+<b>${avg}</b>
+</div>
+
+<h3>Bölümler</h3>
+${s.chapters.map(c=>`
+<div class="chapter" onclick="openChapter(${id},${c.id})">
+${c.title} (${c.views})
+</div>`).join("")}
+
+<div id="disqus_thread"></div>
+`;
+loadDisqus(id);
 }
 
-function openSeries(id,data){
- seriesDiv.classList.add("hidden");
- detailDiv.classList.remove("hidden");
- detailDiv.innerHTML=`
- <h2 style="text-align:center">${data.title}</h2>
- <div id="stars" style="text-align:center"></div>
- <p style="text-align:center">Ortalama: ${avg(data.rate||[])} / 5</p>
- <hr>
- <div id="chapters"></div>
- `;
- for(let i=1;i<=5;i++){
-  const s=document.createElement("span");
-  s.className="star";
-  s.innerText="★";
-  s.onclick=()=>rate(id,i);
-  stars.appendChild(s);
- }
- db.collection("series").doc(id).collection("chapters").get().then(cs=>{
-  cs.forEach(c=>{
-   const ch=document.createElement("div");
-   ch.className="chapter";
-   ch.innerText=c.data().title;
-   ch.onclick=()=>openChapter(id,c.id);
-   chapters.appendChild(ch);
-  });
- });
+function rate(id,val){
+const s=data.series.find(x=>x.id===id);
+s.rating.push(val);
+save();
+openSeries(id);
 }
 
-function rate(id,v){
- if(!auth.currentUser)return alert("Giriş yap");
- const ref=db.collection("series").doc(id);
- ref.get().then(d=>{
-  const r=d.data().rate||[];
-  ref.update({rate:[...r,v]});
- });
+function openChapter(sid,cid){
+const s=data.series.find(x=>x.id===sid);
+const c=s.chapters.find(x=>x.id===cid);
+c.views++; save();
+
+detail.classList.add("hidden");
+reader.classList.remove("hidden");
+reader.innerHTML=c.pages.map(p=>`<img src="${p}">`).join("");
 }
 
-function avg(a){return a.length?(a.reduce((x,y)=>x+y,0)/a.length).toFixed(1):"0"}
-
-function openChapter(s,c){
- detailDiv.classList.add("hidden");
- readerDiv.classList.remove("hidden");
- readerDiv.innerHTML="";
- const ref=db.collection("series").doc(s).collection("chapters").doc(c);
- ref.get().then(d=>{
-  d.data().pages.forEach(p=>{
-   const i=document.createElement("img");
-   i.src=p;i.className="page";
-   readerDiv.appendChild(i);
-  });
-  readerDiv.innerHTML+=`
-  <div id="disqus_thread"></div>
-  `;
-  var d=document,scr=d.createElement("script");
-  scr.src="https://DISQUS_SHORTNAME.disqus.com/embed.js";
-  scr.setAttribute("data-timestamp",+new Date());
-  d.body.appendChild(scr);
- });
+function adminLogin(){
+if(adminPass.value===ADMIN_PASSWORD){
+isAdmin=true;
+alert("Admin girişi başarılı");
+}else alert("Hatalı şifre");
 }
 
-function goHome(){
- detailDiv.classList.add("hidden");
- readerDiv.classList.add("hidden");
- seriesDiv.classList.remove("hidden");
+function loadDisqus(id){
+window.disqus_config=function(){
+this.page.identifier=id;
+};
+let d=document,s=d.createElement("script");
+s.src="https://YOUR_SHORTNAME.disqus.com/embed.js";
+s.setAttribute("data-timestamp",+new Date());
+(d.head||d.body).appendChild(s);
 }
 
-loadSeries();
+renderSeries();
 </script>
 
 </body>
