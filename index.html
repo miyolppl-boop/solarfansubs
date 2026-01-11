@@ -21,44 +21,100 @@
 
 <style>
 body{margin:0;font-family:Arial;background:#0b0b0b;color:#f5f5dc}
+
+/* HEADER */
 header{
- background:#000;padding:10px 15px;
- display:flex;align-items:center;justify-content:space-between;
- gap:10px;position:relative;z-index:1000
+ background:#000;
+ padding:10px 15px;
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:10px;
+ position:relative;
+ z-index:1000;
 }
 header h1{color:#f5d76e;margin:0;font-size:20px;cursor:pointer}
+
+/* SEARCH */
 #search{max-width:220px;padding:6px 10px;font-size:14px}
-.menu-btn{font-size:22px;color:#f5d76e;cursor:pointer;z-index:1001}
+
+/* HAMBURGER */
+.menu-btn{
+ font-size:22px;
+ color:#f5d76e;
+ cursor:pointer;
+ position:relative;
+ z-index:1001;
+}
+
+/* MENU */
 #menu{
- position:fixed;top:0;right:-260px;width:260px;height:100%;
- background:#111;padding:25px 20px;transition:.3s;z-index:999
+ position:fixed;
+ top:0;
+ right:-260px;
+ width:260px;
+ height:100%;
+ background:#111;
+ padding:25px 20px;
+ transition:.3s;
+ z-index:999;
+ box-sizing:border-box;
 }
 #menu.active{right:0}
+#menu h3{
+ margin-top:0;
+ margin-bottom:10px;
+ text-align:center;
+}
+
+/* ADMIN MENU */
 .menu-item{
- padding:10px;margin:6px 0;
- background:#1a1a1a;border-radius:6px;cursor:pointer
+ padding:10px;
+ margin:6px 0;
+ background:#1a1a1a;
+ border-radius:6px;
+ cursor:pointer
 }
 .menu-item:hover{background:#222}
+
 .hidden{display:none}
+
+/* PROFİL */
 .profile-box{text-align:center;margin-bottom:15px}
 .profile-box img{
- width:90px;height:90px;border-radius:50%;
- border:2px solid #f5d76e;cursor:pointer
+ width:90px;height:90px;
+ border-radius:50%;
+ object-fit:cover;
+ border:2px solid #f5d76e;
+ cursor:pointer
 }
 .profile-box input{display:none}
-#series{padding:20px}
-#series h2{border-bottom:2px solid #f5d76e;padding-bottom:5px}
+
+/* SERİLER */
+#series{
+ padding:20px;
+}
+#series h2{
+ border-bottom:2px solid #f5d76e;
+ padding-bottom:5px;
+}
 </style>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 </head>
 
 <body>
 
 <header>
- <h1>SolarFansub</h1>
+ <h1 onclick="goHome()">SolarFansub</h1>
  <input id="search" placeholder="Seri ara...">
  <div class="menu-btn" onclick="toggleMenu()">☰</div>
 </header>
 
+<!-- SERİLER -->
 <div id="series">
  <h2>SERİLER</h2>
  <p>Henüz seri yok.</p>
@@ -69,7 +125,8 @@ header h1{color:#f5d76e;margin:0;font-size:20px;cursor:pointer}
 
  <div id="loginBox">
   <h3>Admin Girişi</h3>
-  <input id="adminPassword" type="password" placeholder="Şifre">
+  <input id="email" placeholder="E-mail">
+  <input id="password" type="password">
   <button onclick="login()">Giriş</button>
  </div>
 
@@ -89,50 +146,54 @@ header h1{color:#f5d76e;margin:0;font-size:20px;cursor:pointer}
 </div>
 
 <script>
-/* 🔐 ADMIN ŞİFRESİ */
-const ADMIN_PASSWORD = "BURAYA_SIFRE_YAZ";
+const firebaseConfig={
+ apiKey:"BURAYA",
+ authDomain:"BURAYA",
+ projectId:"BURAYA",
+ storageBucket:"BURAYA.appspot.com",
+ appId:"BURAYA"
+};
+firebase.initializeApp(firebaseConfig);
+
+const auth=firebase.auth();
+const storage=firebase.storage();
 
 function toggleMenu(){
  document.getElementById("menu").classList.toggle("active");
 }
 
-/* LOGIN */
-function login(){
- const pass = document.getElementById("adminPassword").value;
- if(pass === ADMIN_PASSWORD){
+auth.onAuthStateChanged(u=>{
+ if(u){
   loginBox.classList.add("hidden");
   adminMenu.classList.remove("hidden");
-  localStorage.setItem("adminLogin","true");
+  loadAvatar();
  }else{
-  alert("Şifre yanlış");
+  loginBox.classList.remove("hidden");
+  adminMenu.classList.add("hidden");
  }
+});
+
+function login(){
+ auth.signInWithEmailAndPassword(email.value,password.value)
+ .catch(()=>alert("Giriş hatalı"));
 }
 
-/* LOGOUT */
 function logout(){
- localStorage.removeItem("adminLogin");
- adminMenu.classList.add("hidden");
- loginBox.classList.remove("hidden");
- toggleMenu();
+ auth.signOut().then(()=>menu.classList.remove("active"));
 }
 
-/* SAYFA YENİLENİNCE */
-if(localStorage.getItem("adminLogin")==="true"){
- loginBox.classList.add("hidden");
- adminMenu.classList.remove("hidden");
-}
-
-/* PROFİL FOTO */
 function uploadAvatar(file){
- const reader=new FileReader();
- reader.onload=e=>{
-  adminAvatar.src=e.target.result;
-  localStorage.setItem("adminAvatar",e.target.result);
- };
- reader.readAsDataURL(file);
+ const ref=storage.ref("admin/avatar_"+auth.currentUser.uid);
+ ref.put(file).then(()=>ref.getDownloadURL().then(url=>{
+  adminAvatar.src=url;
+  localStorage.setItem("adminAvatar",url);
+ }));
 }
-const savedAvatar=localStorage.getItem("adminAvatar");
-if(savedAvatar)adminAvatar.src=savedAvatar;
+function loadAvatar(){
+ const a=localStorage.getItem("adminAvatar");
+ if(a)adminAvatar.src=a;
+}
+function goHome(){}
 </script>
 
 </body>
