@@ -5,17 +5,97 @@
 <title>SolarFansub</title>
 
 <!-- SEO -->
-<meta name="description" content="SolarFansub - Türkçe manhwa ve manga okuma sitesi.">
-<meta name="keywords" content="solarfansub, manhwa, manga, türkçe">
-<meta name="author" content="SolarFansub">
+<meta name="description" content="SolarFansub - Türkçe manhwa ve manga okuma sitesi">
+<meta name="keywords" content="manhwa, manga, türkçe manga, solarfansub">
 <meta name="robots" content="index, follow">
 
-<!-- LOGO -->
-<link rel="icon" href="logo.png">
-<link rel="apple-touch-icon" href="logo.png">
+<!-- OG -->
+<meta property="og:title" content="SolarFansub">
+<meta property="og:description" content="Türkçe manhwa ve manga okuma sitesi">
+<meta property="og:type" content="website">
 
-<!-- CSS -->
-<link rel="stylesheet" href="style.css">
+<style>
+/* GENEL */
+body{
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  background:#0b0b0b;
+  color:#f5f5dc;
+}
+
+/* HEADER */
+header{
+  background:#000;
+  padding:10px 15px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+header h1{
+  margin:0;
+  font-size:20px;
+  color:#f5d76e;
+}
+
+/* SEARCH */
+#search{
+  max-width:220px;
+  padding:6px 10px;
+  border-radius:4px;
+  border:none;
+}
+
+/* MENU BUTTON */
+.menu-btn{
+  font-size:22px;
+  cursor:pointer;
+  color:#f5d76e;
+}
+
+/* SERIES */
+#series{
+  padding:20px;
+}
+
+#series h2{
+  margin-top:0;
+  padding-bottom:8px;
+  border-bottom:2px solid #f5d76e;
+}
+
+.empty{
+  opacity:0.7;
+}
+
+/* SIDE MENU */
+#menu{
+  position:fixed;
+  top:0;
+  right:-260px;
+  width:260px;
+  height:100%;
+  background:#111;
+  padding:20px;
+  transition:0.3s;
+}
+
+#menu.active{
+  right:0;
+}
+
+.menu-item{
+  background:#1a1a1a;
+  padding:10px;
+  margin:8px 0;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.menu-item:hover{
+  background:#222;
+}
+</style>
 </head>
 
 <body>
@@ -33,7 +113,7 @@
 
 <!-- SAĞ MENÜ -->
 <div id="menu">
-  <h3>Menü</h3>
+  <div class="menu-item">Menü</div>
   <div class="menu-item">Giriş</div>
 </div>
 
