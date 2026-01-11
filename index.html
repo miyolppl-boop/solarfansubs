@@ -4,71 +4,18 @@
 <meta charset="UTF-8">
 <title>SolarFansub</title>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <!-- SEO -->
-<meta name="description" content="SolarFansub - Türkçe manhwa ve manga okuma sitesi">
-<meta name="keywords" content="solarfansub, manhwa, manga, türkçe manhwa">
+<meta name="description" content="SolarFansub - Türkçe manhwa ve manga okuma sitesi.">
+<meta name="keywords" content="solarfansub, manhwa, manga, türkçe">
 <meta name="author" content="SolarFansub">
+<meta name="robots" content="index, follow">
 
-<style>
-*{box-sizing:border-box}
-body{
- margin:0;
- font-family:Arial,Helvetica,sans-serif;
- background:#0b0b0b;
- color:#f5f5dc;
-}
+<!-- LOGO -->
+<link rel="icon" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
 
-/* HEADER */
-header{
- background:#000;
- padding:12px 15px;
- display:flex;
- align-items:center;
- justify-content:space-between;
- gap:10px;
- border-bottom:2px solid #f5d76e;
-}
-
-header h1{
- margin:0;
- font-size:20px;
- color:#f5d76e;
-}
-
-/* SEARCH */
-#search{
- width:100%;
- max-width:240px;
- padding:6px 10px;
- border-radius:4px;
- border:none;
- outline:none;
-}
-
-/* MENU ICON */
-.menu-btn{
- font-size:22px;
- color:#f5d76e;
- cursor:pointer;
-}
-
-/* SERIES */
-#series{
- padding:20px;
-}
-
-#series h2{
- margin-top:0;
- padding-bottom:8px;
- border-bottom:2px solid #f5d76e;
-}
-
-.empty{
- opacity:.7;
-}
-</style>
+<!-- CSS -->
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -76,13 +23,25 @@ header h1{
 <header>
   <h1>SolarFansub</h1>
   <input id="search" type="text" placeholder="Seri ara...">
-  <div class="menu-btn">☰</div>
+  <div class="menu-btn" onclick="toggleMenu()">☰</div>
 </header>
 
 <div id="series">
   <h2>SERİLER</h2>
   <p class="empty">Henüz seri yok.</p>
 </div>
+
+<!-- SAĞ MENÜ -->
+<div id="menu">
+  <h3>Menü</h3>
+  <div class="menu-item">Giriş</div>
+</div>
+
+<script>
+function toggleMenu(){
+  document.getElementById("menu").classList.toggle("active");
+}
+</script>
 
 </body>
 </html>
