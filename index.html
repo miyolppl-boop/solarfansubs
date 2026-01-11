@@ -4,155 +4,135 @@
 <meta charset="UTF-8">
 <title>SolarFansub</title>
 
-<meta name="description" content="SolarFansub - Türkçe manhwa ve manga okuma sitesi">
+<!-- SEO -->
+<meta name="description" content="SolarFansub - Türkçe manhwa ve manga okuma sitesi. Güncel seriler, bölümler ve yorumlar.">
+<meta name="keywords" content="solarfansub, manhwa oku, manga oku, türkçe manhwa, manhwa türkçe">
+<meta name="author" content="SolarFansub">
 <meta name="robots" content="index, follow">
-<link rel="icon" href="logo.png">
+
+<!-- SITE LOGO -->
+<link rel="icon" href="logo.png" type="image/png">
+<link rel="apple-touch-icon" href="logo.png">
+
+<meta property="og:title" content="SolarFansub">
+<meta property="og:description" content="Türkçe manhwa ve manga okuma sitesi">
+<meta property="og:type" content="website">
+<meta property="og:image" content="logo.png">
 
 <style>
 body{margin:0;font-family:Arial;background:#0b0b0b;color:#f5f5dc}
-header{background:#000;padding:10px;display:flex;justify-content:space-between;align-items:center}
-h1{color:#f5d76e;margin:0}
-.menu-btn{font-size:24px;color:#f5d76e;cursor:pointer}
-#menu{position:fixed;top:0;right:-280px;width:280px;height:100%;background:#111;padding:20px;transition:.3s}
+header{
+ background:#000;padding:10px 15px;
+ display:flex;align-items:center;justify-content:space-between;
+ gap:10px;position:relative;z-index:1000
+}
+header h1{color:#f5d76e;margin:0;font-size:20px;cursor:pointer}
+#search{max-width:220px;padding:6px 10px;font-size:14px}
+.menu-btn{font-size:22px;color:#f5d76e;cursor:pointer;z-index:1001}
+#menu{
+ position:fixed;top:0;right:-260px;width:260px;height:100%;
+ background:#111;padding:25px 20px;transition:.3s;z-index:999
+}
 #menu.active{right:0}
+.menu-item{
+ padding:10px;margin:6px 0;
+ background:#1a1a1a;border-radius:6px;cursor:pointer
+}
+.menu-item:hover{background:#222}
 .hidden{display:none}
-button{padding:8px;margin-top:5px;width:100%}
-input,textarea{width:100%;padding:6px;margin-top:5px}
-.series{padding:15px}
-.series-item{border-bottom:1px solid #333;padding:10px}
-.reader img{width:100%;margin-bottom:10px}
-.like{cursor:pointer;color:gold}
-.admin-box{margin-top:10px}
+.profile-box{text-align:center;margin-bottom:15px}
+.profile-box img{
+ width:90px;height:90px;border-radius:50%;
+ border:2px solid #f5d76e;cursor:pointer
+}
+.profile-box input{display:none}
+#series{padding:20px}
+#series h2{border-bottom:2px solid #f5d76e;padding-bottom:5px}
 </style>
 </head>
 
 <body>
 
 <header>
-<h1>SolarFansub</h1>
-<div class="menu-btn" onclick="toggleMenu()">☰</div>
+ <h1>SolarFansub</h1>
+ <input id="search" placeholder="Seri ara...">
+ <div class="menu-btn" onclick="toggleMenu()">☰</div>
 </header>
 
-<div class="series" id="series"></div>
+<div id="series">
+ <h2>SERİLER</h2>
+ <p>Henüz seri yok.</p>
+</div>
 
+<!-- SAĞ MENÜ -->
 <div id="menu">
-<div id="loginBox">
-<h3>Admin Girişi</h3>
-<input id="adminPass" type="password" placeholder="Şifre">
-<button onclick="login()">Giriş</button>
-</div>
 
-<div id="adminPanel" class="hidden">
-<h3>Admin Panel</h3>
+ <div id="loginBox">
+  <h3>Admin Girişi</h3>
+  <input id="adminPassword" type="password" placeholder="Şifre">
+  <button onclick="login()">Giriş</button>
+ </div>
 
-<img id="avatar" src="https://via.placeholder.com/100" width="100"><br>
-<input type="file" onchange="changeAvatar(this.files[0])">
+ <div id="adminMenu" class="hidden">
+  <div class="profile-box">
+   <img id="adminAvatar" src="https://via.placeholder.com/100" onclick="avatarInput.click()">
+   <input type="file" id="avatarInput" accept="image/*" onchange="uploadAvatar(this.files[0])">
+   <small>Profil fotoğrafını değiştir</small>
+  </div>
 
-<h4>Şifre Değiştir</h4>
-<input id="newPass" placeholder="Yeni Şifre">
-<button onclick="changePassword()">Kaydet</button>
+  <h3>Yönetim</h3>
+  <div class="menu-item">👤 Admin Panel</div>
+  <div class="menu-item">➕ Seri Ekle</div>
+  <div class="menu-item" onclick="logout()">🚪 Çıkış</div>
+ </div>
 
-<h4>Seri Ekle</h4>
-<input id="serieName" placeholder="Seri adı">
-<button onclick="addSerie()">Ekle</button>
-
-<h4>Bölüm Ekle</h4>
-<input id="chapterSerie" placeholder="Seri adı">
-<input id="chapterName" placeholder="Bölüm adı">
-<textarea id="chapterImages" placeholder="Resim URL (alt alta)"></textarea>
-<button onclick="addChapter()">Bölüm Ekle</button>
-
-<button onclick="logout()">Çıkış</button>
-</div>
 </div>
 
 <script>
-let ADMIN_PASSWORD = localStorage.getItem("adminPass") || "SIFRE_YAZ";
+/* 🔐 ADMIN ŞİFRESİ */
+const ADMIN_PASSWORD = "BURAYA_SIFRE_YAZ";
 
-const seriesDiv=document.getElementById("series");
-const data=JSON.parse(localStorage.getItem("data")||"{}");
+function toggleMenu(){
+ document.getElementById("menu").classList.toggle("active");
+}
 
-function save(){localStorage.setItem("data",JSON.stringify(data));}
-
-function toggleMenu(){menu.classList.toggle("active")}
-
+/* LOGIN */
 function login(){
- if(adminPass.value===ADMIN_PASSWORD){
-  localStorage.setItem("admin","1");
+ const pass = document.getElementById("adminPassword").value;
+ if(pass === ADMIN_PASSWORD){
   loginBox.classList.add("hidden");
-  adminPanel.classList.remove("hidden");
+  adminMenu.classList.remove("hidden");
+  localStorage.setItem("adminLogin","true");
+ }else{
+  alert("Şifre yanlış");
  }
 }
 
+/* LOGOUT */
 function logout(){
- localStorage.removeItem("admin");
- location.reload();
+ localStorage.removeItem("adminLogin");
+ adminMenu.classList.add("hidden");
+ loginBox.classList.remove("hidden");
+ toggleMenu();
 }
 
-if(localStorage.getItem("admin")){
+/* SAYFA YENİLENİNCE */
+if(localStorage.getItem("adminLogin")==="true"){
  loginBox.classList.add("hidden");
- adminPanel.classList.remove("hidden");
+ adminMenu.classList.remove("hidden");
 }
 
-function changePassword(){
- ADMIN_PASSWORD=newPass.value;
- localStorage.setItem("adminPass",ADMIN_PASSWORD);
- alert("Şifre değişti");
-}
-
-function changeAvatar(file){
- const r=new FileReader();
- r.onload=e=>{
-  avatar.src=e.target.result;
-  localStorage.setItem("avatar",e.target.result);
+/* PROFİL FOTO */
+function uploadAvatar(file){
+ const reader=new FileReader();
+ reader.onload=e=>{
+  adminAvatar.src=e.target.result;
+  localStorage.setItem("adminAvatar",e.target.result);
  };
- r.readAsDataURL(file);
+ reader.readAsDataURL(file);
 }
-if(localStorage.getItem("avatar")) avatar.src=localStorage.getItem("avatar");
-
-function addSerie(){
- data[serieName.value]={chapters:[]};
- save(); render();
-}
-
-function addChapter(){
- data[chapterSerie.value].chapters.push({
-  name:chapterName.value,
-  imgs:chapterImages.value.split("\n"),
-  likes:0
- });
- save(); render();
-}
-
-function render(){
- seriesDiv.innerHTML="";
- for(let s in data){
-  let d=document.createElement("div");
-  d.innerHTML=`<h2>${s}</h2>`;
-  data[s].chapters.forEach((c,i)=>{
-   d.innerHTML+=`
-   <div class="series-item">
-   ${c.name}
-   <span class="like" onclick="like('${s}',${i})">⭐ ${c.likes}</span>
-   ${localStorage.getItem(s+i)?"✅":"🆕"}
-   <button onclick="read('${s}',${i})">Oku</button>
-   ${localStorage.getItem("admin")?`<button onclick="del('${s}',${i})">Sil</button>`:""}
-   </div>`;
-  });
-  seriesDiv.appendChild(d);
- }
-}
-render();
-
-function like(s,i){data[s].chapters[i].likes++;save();render();}
-function del(s,i){data[s].chapters.splice(i,1);save();render();}
-
-function read(s,i){
- localStorage.setItem(s+i,"1");
- document.body.innerHTML=`<div class="reader">${
- data[s].chapters[i].imgs.map(x=>`<img src="${x}">`).join("")
- }</div>`;
-}
+const savedAvatar=localStorage.getItem("adminAvatar");
+if(savedAvatar)adminAvatar.src=savedAvatar;
 </script>
 
 </body>
