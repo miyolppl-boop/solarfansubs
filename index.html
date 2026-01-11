@@ -1,36 +1,21 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <title>SolarFansub</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<title>SolarFansub</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <header class="topbar">
-    <img src="img/logo.png" class="logo" alt="SolarFansub">
-
-    <input type="text" id="searchInput" placeholder="Seri ara...">
-
-    <div class="menu">☰</div>
+    <img src="img/logo.png" class="logo">
+    <input type="text" id="search" placeholder="Seri ara...">
 </header>
 
-<section class="announcement">
-    <h2>ÖNEMLİ DUYURU</h2>
-    <p>
-        Herkese Merhaba! Bu bizim <b>TEK</b> gerçek sitemizdir.  
-        Serilerimizi ücretsiz okuyabilirsiniz.
-    </p>
-</section>
+<div id="seriesGrid" class="grid"></div>
 
-<!-- SERİLER -->
-<section class="series">
-    <div id="seriesGrid" class="series-grid"></div>
-    <p id="noSeries">Henüz seri eklenmedi.</p>
-</section>
-
-<script src="js/series.js"></script>
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
 </body>
 </html>
-
