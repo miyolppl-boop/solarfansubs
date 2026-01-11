@@ -16,3 +16,15 @@ function prev() {
 function next() {
   location.href = `chapter.html?id=${id}&c=${c+1}`;
 }
+// === SAFE NAVIGATION ===
+function prev() {
+  if (c > 1) {
+    location.href = `chapter.html?id=${id}&c=${c-1}`;
+  }
+}
+
+function next() {
+  if (c < data[id].chapters.length) {
+    location.href = `chapter.html?id=${id}&c=${c+1}`;
+  }
+}
