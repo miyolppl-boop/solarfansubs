@@ -51,3 +51,12 @@ if (search && grid) {
     }
   });
 }
+// === SHOW LAST READ ===
+if (id && document.getElementById("chapters")) {
+  const last = localStorage.getItem(`last_${id}`);
+  if (last) {
+    const info = document.createElement("p");
+    info.innerText = `Son okunan bölüm: ${last}`;
+    document.getElementById("chapters").prepend(info);
+  }
+}
