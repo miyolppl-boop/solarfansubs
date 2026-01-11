@@ -5,122 +5,195 @@
 <title>SolarFansub</title>
 
 <!-- SEO -->
-<meta name="description" content="SolarFansub - Türkçe manhwa ve manga okuma sitesi">
-<meta name="keywords" content="manhwa, manga, türkçe manga, solarfansub">
+<meta name="description" content="SolarFansub - Türkçe manhwa ve manga okuma sitesi. Güncel seriler, bölümler ve yorumlar.">
+<meta name="keywords" content="solarfansub, manhwa oku, manga oku, türkçe manhwa, manhwa türkçe">
+<meta name="author" content="SolarFansub">
 <meta name="robots" content="index, follow">
 
-<!-- OG -->
+<!-- SITE LOGO -->
+<link rel="icon" href="logo.png" type="image/png">
+<link rel="apple-touch-icon" href="logo.png">
+
 <meta property="og:title" content="SolarFansub">
 <meta property="og:description" content="Türkçe manhwa ve manga okuma sitesi">
 <meta property="og:type" content="website">
+<meta property="og:image" content="logo.png">
 
 <style>
-/* GENEL */
-body{
-  margin:0;
-  font-family:Arial, Helvetica, sans-serif;
-  background:#0b0b0b;
-  color:#f5f5dc;
-}
+body{margin:0;font-family:Arial;background:#0b0b0b;color:#f5f5dc}
 
 /* HEADER */
 header{
-  background:#000;
-  padding:10px 15px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+ background:#000;
+ padding:10px 15px;
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:10px;
+ position:relative;
+ z-index:1000;
 }
-
-header h1{
-  margin:0;
-  font-size:20px;
-  color:#f5d76e;
-}
+header h1{color:#f5d76e;margin:0;font-size:20px;cursor:pointer}
 
 /* SEARCH */
-#search{
-  max-width:220px;
-  padding:6px 10px;
-  border-radius:4px;
-  border:none;
-}
+#search{max-width:220px;padding:6px 10px;font-size:14px}
 
-/* MENU BUTTON */
+/* HAMBURGER */
 .menu-btn{
-  font-size:22px;
-  cursor:pointer;
-  color:#f5d76e;
+ font-size:22px;
+ color:#f5d76e;
+ cursor:pointer;
+ position:relative;
+ z-index:1001;
 }
 
-/* SERIES */
-#series{
-  padding:20px;
-}
-
-#series h2{
-  margin-top:0;
-  padding-bottom:8px;
-  border-bottom:2px solid #f5d76e;
-}
-
-.empty{
-  opacity:0.7;
-}
-
-/* SIDE MENU */
+/* MENU */
 #menu{
-  position:fixed;
-  top:0;
-  right:-260px;
-  width:260px;
-  height:100%;
-  background:#111;
-  padding:20px;
-  transition:0.3s;
+ position:fixed;
+ top:0;
+ right:-260px;
+ width:260px;
+ height:100%;
+ background:#111;
+ padding:25px 20px;
+ transition:.3s;
+ z-index:999;
+ box-sizing:border-box;
+}
+#menu.active{right:0}
+#menu h3{
+ margin-top:0;
+ margin-bottom:10px;
+ text-align:center;
 }
 
-#menu.active{
-  right:0;
-}
-
+/* ADMIN MENU */
 .menu-item{
-  background:#1a1a1a;
-  padding:10px;
-  margin:8px 0;
-  border-radius:6px;
-  cursor:pointer;
+ padding:10px;
+ margin:6px 0;
+ background:#1a1a1a;
+ border-radius:6px;
+ cursor:pointer
 }
+.menu-item:hover{background:#222}
 
-.menu-item:hover{
-  background:#222;
+.hidden{display:none}
+
+/* PROFİL */
+.profile-box{text-align:center;margin-bottom:15px}
+.profile-box img{
+ width:90px;height:90px;
+ border-radius:50%;
+ object-fit:cover;
+ border:2px solid #f5d76e;
+ cursor:pointer
+}
+.profile-box input{display:none}
+
+/* SERİLER */
+#series{
+ padding:20px;
+}
+#series h2{
+ border-bottom:2px solid #f5d76e;
+ padding-bottom:5px;
 }
 </style>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 </head>
 
 <body>
 
 <header>
-  <h1>SolarFansub</h1>
-  <input id="search" type="text" placeholder="Seri ara...">
-  <div class="menu-btn" onclick="toggleMenu()">☰</div>
+ <h1 onclick="goHome()">SolarFansub</h1>
+ <input id="search" placeholder="Seri ara...">
+ <div class="menu-btn" onclick="toggleMenu()">☰</div>
 </header>
 
+<!-- SERİLER -->
 <div id="series">
-  <h2>SERİLER</h2>
-  <p class="empty">Henüz seri yok.</p>
+ <h2>SERİLER</h2>
+ <p>Henüz seri yok.</p>
 </div>
 
 <!-- SAĞ MENÜ -->
 <div id="menu">
-  <div class="menu-item">Menü</div>
-  <div class="menu-item">Giriş</div>
+
+ <div id="loginBox">
+  <h3>Admin Girişi</h3>
+  <input id="email" placeholder="E-mail">
+  <input id="password" type="password">
+  <button onclick="login()">Giriş</button>
+ </div>
+
+ <div id="adminMenu" class="hidden">
+  <div class="profile-box">
+   <img id="adminAvatar" src="https://via.placeholder.com/100" onclick="avatarInput.click()">
+   <input type="file" id="avatarInput" accept="image/*" onchange="uploadAvatar(this.files[0])">
+   <small>Profil fotoğrafını değiştir</small>
+  </div>
+
+  <h3>Yönetim</h3>
+  <div class="menu-item">👤 Admin Panel</div>
+  <div class="menu-item">➕ Seri Ekle</div>
+  <div class="menu-item" onclick="logout()">🚪 Çıkış</div>
+ </div>
+
 </div>
 
 <script>
+const firebaseConfig={
+ apiKey:"BURAYA",
+ authDomain:"BURAYA",
+ projectId:"BURAYA",
+ storageBucket:"BURAYA.appspot.com",
+ appId:"BURAYA"
+};
+firebase.initializeApp(firebaseConfig);
+
+const auth=firebase.auth();
+const storage=firebase.storage();
+
 function toggleMenu(){
-  document.getElementById("menu").classList.toggle("active");
+ document.getElementById("menu").classList.toggle("active");
 }
+
+auth.onAuthStateChanged(u=>{
+ if(u){
+  loginBox.classList.add("hidden");
+  adminMenu.classList.remove("hidden");
+  loadAvatar();
+ }else{
+  loginBox.classList.remove("hidden");
+  adminMenu.classList.add("hidden");
+ }
+});
+
+function login(){
+ auth.signInWithEmailAndPassword(email.value,password.value)
+ .catch(()=>alert("Giriş hatalı"));
+}
+
+function logout(){
+ auth.signOut().then(()=>menu.classList.remove("active"));
+}
+
+function uploadAvatar(file){
+ const ref=storage.ref("admin/avatar_"+auth.currentUser.uid);
+ ref.put(file).then(()=>ref.getDownloadURL().then(url=>{
+  adminAvatar.src=url;
+  localStorage.setItem("adminAvatar",url);
+ }));
+}
+function loadAvatar(){
+ const a=localStorage.getItem("adminAvatar");
+ if(a)adminAvatar.src=a;
+}
+function goHome(){}
 </script>
 
 </body>
