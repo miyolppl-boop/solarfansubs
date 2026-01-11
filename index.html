@@ -7,7 +7,7 @@
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial;background:#0c0c0c;color:#eee}
-header{background:#000;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+header{background:#000;padding:12px 16px;display:flex;gap:10px;align-items:center}
 .logo{color:#f5d76e;font-size:20px;font-weight:bold;cursor:pointer}
 input,textarea,button,select{padding:8px;border-radius:6px;border:none;width:100%;margin:4px 0}
 button{background:#f5d76e;color:#000;cursor:pointer}
@@ -17,8 +17,6 @@ button{background:#f5d76e;color:#000;cursor:pointer}
 .card{background:#151515;border-radius:8px;padding:10px;text-align:center;cursor:pointer}
 .card img{width:100%;height:230px;object-fit:cover;border-radius:6px}
 .hidden{display:none}
-.star{font-size:22px;color:#444;cursor:pointer}
-.star.active{color:#f5d76e}
 .chapter{background:#1f1f1f;padding:10px;border-radius:6px;margin:6px 0;cursor:pointer}
 .new{color:#0f0;font-size:12px;margin-left:6px}
 .reader img{width:100%;margin-bottom:10px}
@@ -59,59 +57,64 @@ button{background:#f5d76e;color:#000;cursor:pointer}
 
 <select id="seriesSelect"></select>
 <input id="cTitle" placeholder="Bölüm adı">
-<textarea id="cPages" placeholder="Sayfa URL'leri (her satır 1 resim)"></textarea>
+<input id="cPages" type="file" multiple accept="image/*">
 <button onclick="addChapter()">📚 Bölüm Ekle</button>
 
 <button onclick="logout()">🚪 Admin Çıkış</button>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, arrayUnion, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC3ccMdaINKIkNYP8ewXiOmwO875djv45c",
+  authDomain: "solarfansubs-4db5c.firebaseapp.com",
+  projectId: "solarfansubs-4db5c",
+  storageBucket: "solarfansubs-4db5c.firebasestorage.app",
+  messagingSenderId: "179563514962",
+  appId: "1:179563514962:web:87c42527ce9c38d005638b"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 const ADMIN_PASSWORDS=["alamuzpulums&129qam","admin2"];
-let data=JSON.parse(localStorage.getItem("DATA"))||{series:[]};
-let favs=JSON.parse(localStorage.getItem("FAVS"))||[];
+let series=[];
 
-function save(){localStorage.setItem("DATA",JSON.stringify(data))}
-function avg(s){return s.rating.length? s.rating.reduce((a,b)=>a+b,0)/s.rating.length:0}
+window.goHome=()=>{detail.classList.add("hidden");reader.classList.add("hidden");home.classList.remove("hidden");renderSeries();}
 
-function goHome(){
-detail.classList.add("hidden");
-reader.classList.add("hidden");
-home.classList.remove("hidden");
-renderSeries();
+async function loadSeries(){
+series=[];
+const snap=await getDocs(collection(db,"series"));
+snap.forEach(d=>series.push({...d.data(),fid:d.id}));
+renderSeries(); updateSeriesSelect();
 }
+loadSeries();
 
-function renderSeries(){
+window.renderSeries=()=>{
 home.innerHTML="";
-let now=Date.now();
+const q=search.value.toLowerCase();
+let list=series.filter(s=>s.title.toLowerCase().includes(q));
+let popular=[...list].sort((a,b)=>b.views-a.views).slice(0,6);
+let others=list.filter(s=>!popular.includes(s));
 
-let weekPopular=[...data.series].sort((a,b)=>b.views-a.views)[0];
-let mostRead=[...data.series].sort((a,b)=>b.views-a.views).slice(0,6);
-let popular=[...data.series].sort((a,b)=>avg(b)-avg(a)).slice(0,6);
-let others=[...data.series].filter(s=>!popular.includes(s));
-
-let html="";
-
-if(weekPopular){
-html+=`<div class="section-title">🔥 Haftanın Popüleri</div><div class="grid">${card(weekPopular)}</div>`;
+home.innerHTML=`
+<div class="section-title">⭐ Popüler Seriler</div>
+<div class="grid">${popular.map(card).join("")}</div>
+<div class="section-title">📚 Diğer Seriler</div>
+<div class="grid">${others.map(card).join("")}</div>`;
 }
 
-html+=`<div class="section-title">👁 En Çok Okunanlar</div><div class="grid">${mostRead.map(card).join("")}</div>`;
-html+=`<div class="section-title">⭐ Popüler Seriler</div><div class="grid">${popular.map(card).join("")}</div>`;
-html+=`<div class="section-title">📚 Diğer Seriler</div><div class="grid">${others.map(card).join("")}</div>`;
-
-home.innerHTML=html;
-}
-
-function card(s){
-return `<div class="card" onclick="openSeries(${s.id})">
+const card=s=>`
+<div class="card" onclick="openSeries('${s.fid}')">
 <img src="${s.cover}">
 <b>${s.title}</b>
 </div>`;
-}
 
-function openSeries(id){
-const s=data.series.find(x=>x.id===id);
-s.views++; save();
+window.openSeries=async id=>{
+const s=series.find(x=>x.fid===id);
+await updateDoc(doc(db,"series",id),{views:increment(1)});
 home.classList.add("hidden");
 detail.classList.remove("hidden");
 
@@ -121,81 +124,71 @@ detail.innerHTML=`
 <p>${s.desc}</p>
 <p><b>Türler:</b> ${s.genres.join(", ")}</p>
 <p><b>Durum:</b> ${s.status}</p>
-<p><b>Favori:</b> ${favs.filter(f=>f===id).length}</p>
-
-<button onclick="toggleFav(${id})">⭐ Takip Et</button>
-
 <h3>Bölümler</h3>
-${s.chapters.map(c=>`
-<div class="chapter" onclick="openChapter(${id},${c.id})">
+${(s.chapters||[]).map(c=>`
+<div class="chapter" onclick="openChapter('${id}',${c.created})">
 ${c.title} ${Date.now()-c.created<86400000?'<span class="new">NEW</span>':''}
-</div>`).join("")}
-`;
+</div>`).join("")}`;
 }
 
-function toggleFav(id){
-if(!favs.includes(id)) favs.push(id);
-localStorage.setItem("FAVS",JSON.stringify(favs));
-alert("Favorilere eklendi");
-}
-
-function openChapter(sid,cid){
-const s=data.series.find(x=>x.id===sid);
-const c=s.chapters.find(x=>x.id===cid);
+window.openChapter=(sid,cid)=>{
+const s=series.find(x=>x.fid===sid);
+const c=s.chapters.find(x=>x.created===cid);
 detail.classList.add("hidden");
 reader.classList.remove("hidden");
 reader.innerHTML=c.pages.map(p=>`<img src="${p}">`).join("");
 }
 
-function adminLogin(){
+window.adminLogin=()=>{
 if(ADMIN_PASSWORDS.includes(adminPass.value)){
 adminLoginBox.classList.add("hidden");
 adminPanel.classList.remove("hidden");
-updateSeriesSelect();
 }else alert("Hatalı şifre");
 }
 
-function logout(){
-adminPanel.classList.add("hidden");
-adminLoginBox.classList.remove("hidden");
-}
+window.logout=()=>{adminPanel.classList.add("hidden");adminLoginBox.classList.remove("hidden");}
 
-function addSeries(){
-const file=sCover.files[0];
+window.addSeries=()=>{
 const r=new FileReader();
-r.onload=e=>{
-data.series.push({
-id:Date.now(),
+r.onload=async e=>{
+await addDoc(collection(db,"series"),{
 title:sTitle.value,
 cover:e.target.result,
 desc:sDesc.value,
 genres:sGenres.value.split(","),
 status:sStatus.value,
-rating:[],
 views:0,
 chapters:[]
 });
-save(); renderSeries(); updateSeriesSelect();
+loadSeries();
 };
-r.readAsDataURL(file);
+r.readAsDataURL(sCover.files[0]);
 }
 
-function addChapter(){
-const s=data.series.find(x=>x.id==seriesSelect.value);
-s.chapters.push({
-id:Date.now(),
-title:cTitle.value,
-pages:cPages.value.split("\n"),
-created:Date.now()
+window.addChapter=async()=>{
+const files=[...cPages.files];
+let pages=[];
+for(const f of files){
+const r=new FileReader();
+await new Promise(res=>{
+r.onload=e=>{pages.push(e.target.result);res();}
+r.readAsDataURL(f);
 });
-save(); alert("Bölüm eklendi");
+}
+await updateDoc(doc(db,"series",seriesSelect.value),{
+chapters:arrayUnion({
+title:cTitle.value,
+pages,
+created:Date.now()
+})
+});
+alert("Bölüm eklendi");
+loadSeries();
 }
 
-function updateSeriesSelect(){
-seriesSelect.innerHTML=data.series.map(s=>`<option value="${s.id}">${s.title}</option>`).join("");
+window.updateSeriesSelect=()=>{
+seriesSelect.innerHTML=series.map(s=>`<option value="${s.fid}">${s.title}</option>`).join("");
 }
-
-renderSeries();
 </script>
 
 </body>
