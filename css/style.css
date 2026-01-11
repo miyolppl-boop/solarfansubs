@@ -41,3 +41,37 @@ button { padding:10px 20px }
 │
 └── img/
     └── logo.png
+/* === THEME SYSTEM === */
+:root {
+  --bg: #000;
+  --text: #fff4b0;
+  --card: #111;
+  --border: #fff4b0;
+}
+
+body.light {
+  --bg: #fff4b0;
+  --text: #000;
+  --card: #fff;
+  --border: #000;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.card {
+  background: var(--card);
+}
+
+.topbar {
+  border-bottom: 2px solid var(--border);
+}
+
+button {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
