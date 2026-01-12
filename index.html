@@ -2,29 +2,12 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
 <title>SolarFansub | Manhwa & Webtoon Okuma</title>
 
-<!-- SEO -->
-<meta name="description" content="SolarFansub modern manhwa, manga ve webtoon okuma platformu. Hızlı, sade ve karanlık tema.">
-<meta name="keywords" content="manhwa, webtoon, manga, fansub, solarfansub">
-<meta name="author" content="SolarFansub">
+<meta name="description" content="SolarFansub modern manhwa, manga ve webtoon okuma platformu.">
 <meta name="robots" content="index, follow">
-
-<!-- OpenGraph -->
-<meta property="og:title" content="SolarFansub">
-<meta property="og:description" content="Modern Manhwa & Webtoon Okuma Platformu">
-<meta property="og:type" content="website">
-
-<!-- PWA -->
-<link rel="manifest" href="data:application/json,{
-  &quot;name&quot;:&quot;SolarFansub&quot;,
-  &quot;short_name&quot;:&quot;SolarFansub&quot;,
-  &quot;display&quot;:&quot;standalone&quot;,
-  &quot;background_color&quot;:&quot;#000000&quot;,
-  &quot;theme_color&quot;:&quot;#FFD84D&quot;
-}">
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -32,43 +15,119 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
-<!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-GPVRJH497N"></script>
-<script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-GPVRJH497N');
-</script>
-
 <style>
-body{margin:0;font-family:Arial;background:#000;color:#fff}
-header{position:fixed;top:0;width:100%;background:#000;z-index:10;
-display:flex;justify-content:space-between;align-items:center;padding:15px;border-bottom:1px solid #222}
-.logo{color:#FFD84D;font-weight:bold;font-size:20px}
-.menu-btn{font-size:22px;cursor:pointer;color:#FFD84D}
-.section{padding:90px 20px}
-.title{font-size:22px;border-left:4px solid #FFD84D;padding-left:10px;margin-bottom:15px}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial;background:#000;color:#fff;overflow-x:hidden}
 
-.card{background:#111;border:1px solid #222;border-radius:12px;padding:15px;margin-bottom:12px;cursor:pointer}
+header{
+position:fixed;
+top:0;left:0;
+width:100%;
+height:60px;
+background:#000;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 15px;
+border-bottom:1px solid #222;
+z-index:100;
+}
+
+.logo{color:#FFD84D;font-weight:bold;font-size:20px}
+.menu-btn{font-size:26px;cursor:pointer;color:#FFD84D}
+
+.section{padding:80px 15px}
+
+.title{
+font-size:22px;
+border-left:4px solid #FFD84D;
+padding-left:10px;
+margin-bottom:15px
+}
+
+.card{
+background:#111;
+border:1px solid #222;
+border-radius:12px;
+padding:15px;
+margin-bottom:12px;
+cursor:pointer
+}
 .card:hover{border-color:#FFD84D}
 
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;
-background:rgba(0,0,0,.85);justify-content:center;align-items:center;z-index:20}
-.modal-content{background:#111;padding:20px;width:90%;max-width:400px;border-radius:14px}
-
-.input{width:100%;padding:12px;margin-bottom:10px;border-radius:8px;border:none;background:#222;color:#fff}
-.btn{width:100%;padding:12px;background:#FFD84D;border:none;border-radius:8px;font-weight:bold;color:#000}
-.btn-outline{background:none;border:1px solid #FFD84D;color:#FFD84D;margin-top:8px}
-
-.reader img{width:100%;margin-bottom:10px;border-radius:6px}
-
-.side-menu{position:fixed;top:0;left:-260px;width:250px;height:100%;
-background:#0c0c0c;padding:20px;transition:.3s;z-index:30}
+.side-menu{
+position:fixed;
+top:60px;
+left:-260px;
+width:250px;
+height:calc(100% - 60px);
+background:#0c0c0c;
+padding:20px;
+transition:.3s;
+z-index:200;
+overflow-y:auto;
+}
 .side-menu.active{left:0}
-.side-menu a{display:block;color:#FFD84D;text-decoration:none;margin:15px 0}
 
-footer{text-align:center;padding:30px;color:#777;font-size:12px}
+.side-menu a, .side-menu button{
+display:block;
+width:100%;
+margin:10px 0;
+}
+
+.btn{
+padding:12px;
+background:#FFD84D;
+border:none;
+border-radius:8px;
+font-weight:bold;
+color:#000;
+cursor:pointer
+}
+.btn-outline{
+background:none;
+border:1px solid #FFD84D;
+color:#FFD84D;
+padding:12px;
+border-radius:8px;
+cursor:pointer
+}
+
+.modal{
+display:none;
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,.85);
+justify-content:center;
+align-items:center;
+z-index:300
+}
+.modal-content{
+background:#111;
+padding:20px;
+width:90%;
+max-width:400px;
+border-radius:14px
+}
+
+.input{
+width:100%;
+padding:12px;
+margin-bottom:10px;
+border-radius:8px;
+border:none;
+background:#222;
+color:#fff
+}
+
+.reader img{
+width:100%;
+margin-bottom:10px;
+border-radius:6px
+}
+
+footer{text-align:center;padding:25px;color:#777;font-size:12px}
 </style>
 </head>
 
@@ -125,19 +184,24 @@ const auth=firebase.auth();
 const db=firebase.firestore();
 const storage=firebase.storage();
 
-function toggleMenu(){menu.classList.toggle("active")}
+function toggleMenu(){
+menu.classList.toggle("active");
+}
+
 function openLogin(){loginModal.style.display="flex"}
 function openRegister(){registerModal.style.display="flex"}
-function closeModals(){loginModal.style.display=registerModal.style.display="none"}
+function closeModals(){
+loginModal.style.display="none";
+registerModal.style.display="none";
+}
 
 function login(){
-if(!loginEmail.value||!loginPassword.value){alert("Alanları doldur");return}
 auth.signInWithEmailAndPassword(loginEmail.value,loginPassword.value)
 .then(()=>alert("Giriş başarılı"))
 .catch(e=>alert(e.message))
 }
+
 function register(){
-if(!regEmail.value||!regPassword.value){alert("Alanları doldur");return}
 auth.createUserWithEmailAndPassword(regEmail.value,regPassword.value)
 .then(()=>alert("Kayıt başarılı"))
 .catch(e=>alert(e.message))
@@ -145,8 +209,8 @@ auth.createUserWithEmailAndPassword(regEmail.value,regPassword.value)
 
 function adminLogin(){
 let p=prompt("Admin Şifre:");
-if(p==="alamuzpulum3929"){adminPanel()}
-else alert("Hatalı")
+if(p==="alamuzpulum3929") adminPanel();
+else alert("Hatalı");
 }
 
 function adminPanel(){
@@ -159,13 +223,13 @@ content.innerHTML=`
 }
 
 function addSeries(){
-let f=document.getElementById("img").files[0];
-if(!f)return alert("Görsel seç");
+let f=img.files[0];
+if(!f) return alert("Görsel seç");
 let r=storage.ref("covers/"+f.name);
 r.put(f).then(()=>r.getDownloadURL().then(u=>{
 db.collection("series").add({name:sname.value,desc:desc.value,cover:u});
 alert("Seri eklendi");
-}))
+}));
 }
 
 function showHome(){
@@ -173,11 +237,11 @@ content.innerHTML=`<div class="title">New Episodes</div>`;
 db.collection("series").onSnapshot(s=>{
 s.forEach(d=>{
 content.innerHTML+=`<div class="card" onclick="openSeries('${d.id}')">${d.data().name}</div>`;
-})
-})
+});
+});
 }
 
-function showSeries(){showHome()}
+function showSeries(){showHome();}
 
 function openSeries(id){
 db.collection("series").doc(id).get().then(d=>{
@@ -187,7 +251,7 @@ content.innerHTML=`
 <div class="card" onclick="openReader()">Bölüm 1</div>
 <div id="disqus_thread"></div>`;
 loadDisqus();
-})
+});
 }
 
 function openReader(){
