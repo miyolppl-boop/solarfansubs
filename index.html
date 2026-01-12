@@ -2,12 +2,8 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-
-<title>SolarFansub | Manhwa & Webtoon Okuma</title>
-
-<meta name="description" content="SolarFansub modern manhwa, manga ve webtoon okuma platformu.">
-<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SolarFansub</title>
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -16,118 +12,36 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial;background:#000;color:#fff;overflow-x:hidden}
+body{margin:0;font-family:Arial;background:#000;color:#fff}
+header{position:fixed;top:0;width:100%;background:#000;z-index:50;
+display:flex;justify-content:space-between;align-items:center;padding:15px;border-bottom:1px solid #222}
+.logo{color:#FFE37A;font-weight:bold;font-size:20px}
+.menu-btn{font-size:22px;color:#FFE37A;cursor:pointer}
 
-header{
-position:fixed;
-top:0;left:0;
-width:100%;
-height:60px;
-background:#000;
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:0 15px;
-border-bottom:1px solid #222;
-z-index:100;
-}
+.section{padding:90px 15px}
+.title{font-size:22px;border-left:4px solid #FFE37A;padding-left:10px;margin-bottom:15px}
 
-.logo{color:#FFD84D;font-weight:bold;font-size:20px}
-.menu-btn{font-size:26px;cursor:pointer;color:#FFD84D}
+.card{background:#111;border:1px solid #222;border-radius:12px;padding:15px;margin-bottom:12px}
+.card:hover{border-color:#FFE37A}
 
-.section{padding:80px 15px}
-
-.title{
-font-size:22px;
-border-left:4px solid #FFD84D;
-padding-left:10px;
-margin-bottom:15px
-}
-
-.card{
-background:#111;
-border:1px solid #222;
-border-radius:12px;
-padding:15px;
-margin-bottom:12px;
-cursor:pointer
-}
-.card:hover{border-color:#FFD84D}
-
-.side-menu{
-position:fixed;
-top:60px;
-left:-260px;
-width:250px;
-height:calc(100% - 60px);
-background:#0c0c0c;
-padding:20px;
-transition:.3s;
-z-index:200;
-overflow-y:auto;
-}
+.side-menu{position:fixed;top:0;left:-260px;width:250px;height:100%;
+background:#0c0c0c;padding:20px;transition:.3s;z-index:100}
 .side-menu.active{left:0}
+.side-menu a, .side-menu button{display:block;width:100%;margin:10px 0}
 
-.side-menu a, .side-menu button{
-display:block;
-width:100%;
-margin:10px 0;
-}
+.input{width:100%;padding:12px;margin-bottom:10px;border-radius:8px;border:none;background:#222;color:#fff}
+.btn{padding:12px;border:none;border-radius:8px;background:#FFE37A;color:#000;font-weight:bold}
+.btn-outline{background:none;border:1px solid #FFE37A;color:#FFE37A}
 
-.btn{
-padding:12px;
-background:#FFD84D;
-border:none;
-border-radius:8px;
-font-weight:bold;
-color:#000;
-cursor:pointer
-}
-.btn-outline{
-background:none;
-border:1px solid #FFD84D;
-color:#FFD84D;
-padding:12px;
-border-radius:8px;
-cursor:pointer
-}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+background:rgba(0,0,0,.85);justify-content:center;align-items:center;z-index:200}
+.modal-content{background:#111;padding:20px;width:90%;max-width:420px;border-radius:14px}
 
-.modal{
-display:none;
-position:fixed;
-top:0;left:0;
-width:100%;height:100%;
-background:rgba(0,0,0,.85);
-justify-content:center;
-align-items:center;
-z-index:300
-}
-.modal-content{
-background:#111;
-padding:20px;
-width:90%;
-max-width:400px;
-border-radius:14px
-}
+.reader img{width:100%;margin-bottom:10px;border-radius:6px}
 
-.input{
-width:100%;
-padding:12px;
-margin-bottom:10px;
-border-radius:8px;
-border:none;
-background:#222;
-color:#fff
-}
+.search{width:100%;padding:12px;border:none;border-radius:10px;background:#222;color:#fff;margin-bottom:15px}
 
-.reader img{
-width:100%;
-margin-bottom:10px;
-border-radius:6px
-}
-
-footer{text-align:center;padding:25px;color:#777;font-size:12px}
+footer{text-align:center;padding:30px;color:#666;font-size:12px}
 </style>
 </head>
 
@@ -141,9 +55,9 @@ footer{text-align:center;padding:25px;color:#777;font-size:12px}
 <div class="side-menu" id="menu">
 <button class="btn" onclick="openLogin()">Üye Girişi</button>
 <button class="btn-outline" onclick="openRegister()">Üye Kaydı</button>
-<a onclick="showHome()">Ana Sayfa</a>
-<a onclick="showSeries()">Tüm Seriler</a>
-<a onclick="adminLogin()">Admin Girişi</a>
+<button class="btn-outline" onclick="showHome()">Ana Sayfa</button>
+<button class="btn-outline" onclick="showFavorites()">Favoriler</button>
+<button class="btn-outline" onclick="adminLogin()">Admin</button>
 </div>
 
 <div class="section" id="content"></div>
@@ -184,87 +98,131 @@ const auth=firebase.auth();
 const db=firebase.firestore();
 const storage=firebase.storage();
 
-function toggleMenu(){
-menu.classList.toggle("active");
-}
-
+function toggleMenu(){menu.classList.toggle("active")}
 function openLogin(){loginModal.style.display="flex"}
 function openRegister(){registerModal.style.display="flex"}
-function closeModals(){
-loginModal.style.display="none";
-registerModal.style.display="none";
-}
+function closeModals(){loginModal.style.display=registerModal.style.display="none"}
+
+auth.onAuthStateChanged(u=>{ if(u)showHome(); });
 
 function login(){
+if(!loginEmail.value||!loginPassword.value)return alert("Doldur");
 auth.signInWithEmailAndPassword(loginEmail.value,loginPassword.value)
-.then(()=>alert("Giriş başarılı"))
-.catch(e=>alert(e.message))
+.then(()=>closeModals()).catch(e=>alert(e.message))
 }
 
 function register(){
+if(!regEmail.value||!regPassword.value)return alert("Doldur");
 auth.createUserWithEmailAndPassword(regEmail.value,regPassword.value)
-.then(()=>alert("Kayıt başarılı"))
-.catch(e=>alert(e.message))
+.then(()=>closeModals()).catch(e=>alert(e.message))
 }
 
+/* HOME + SEARCH */
+function showHome(){
+content.innerHTML=`
+<input class="search" placeholder="Seri ara..." onkeyup="searchSeries(this.value)">
+<div class="title">New Episodes</div>`;
+loadSeries();
+}
+
+function loadSeries(){
+db.collection("series").get().then(s=>{
+s.forEach(d=>{
+content.innerHTML+=`
+<div class="card" onclick="openSeries('${d.id}')">${d.data().name}</div>`;
+})
+})
+}
+
+function searchSeries(q){
+content.innerHTML=`<input class="search" placeholder="Seri ara..." onkeyup="searchSeries(this.value)" value="${q}">`;
+db.collection("series").get().then(s=>{
+s.forEach(d=>{
+if(d.data().name.toLowerCase().includes(q.toLowerCase())){
+content.innerHTML+=`<div class="card" onclick="openSeries('${d.id}')">${d.data().name}</div>`;
+}
+})
+})
+}
+
+/* SERIES */
+function openSeries(id){
+db.collection("series").doc(id).get().then(d=>{
+content.innerHTML=`
+<div class="title">${d.data().name}</div>
+<p>${d.data().desc}</p>
+<button class="btn-outline" onclick="addFav('${id}')">❤️ Favori</button>`;
+db.collection("series").doc(id).collection("chapters").orderBy("no").get().then(c=>{
+c.forEach(ch=>{
+content.innerHTML+=`
+<div class="card" onclick="openReader('${id}','${ch.id}')">Bölüm ${ch.data().no}</div>`;
+})
+})
+})
+}
+
+/* READER */
+function openReader(sid,cid){
+content.innerHTML=`<div class="title">Okuma</div><div class="reader" id="reader"></div>
+<div id="disqus_thread"></div>`;
+db.collection("series").doc(sid).collection("chapters").doc(cid).get().then(d=>{
+d.data().pages.forEach(p=>{
+reader.innerHTML+=`<img src="${p}">`;
+})
+loadDisqus();
+})
+}
+
+/* FAVORI */
+function addFav(id){
+if(!auth.currentUser)return alert("Giriş yap");
+db.collection("users").doc(auth.currentUser.uid)
+.collection("fav").doc(id).set({t:Date.now()});
+alert("Favorilere eklendi");
+}
+
+function showFavorites(){
+if(!auth.currentUser)return alert("Giriş yap");
+content.innerHTML=`<div class="title">Favoriler</div>`;
+db.collection("users").doc(auth.currentUser.uid).collection("fav").get().then(f=>{
+f.forEach(d=>{
+openSeries(d.id);
+})
+})
+}
+
+/* ADMIN */
 function adminLogin(){
-let p=prompt("Admin Şifre:");
-if(p==="alamuzpulum3929") adminPanel();
+let p=prompt("Admin şifre:");
+if(p==="alamuzpulum3929")adminPanel();
 else alert("Hatalı");
 }
 
 function adminPanel(){
 content.innerHTML=`
 <div class="title">Admin Panel</div>
-<input type="file" id="img">
-<input class="input" id="sname" placeholder="Seri Adı">
-<textarea class="input" id="desc" placeholder="Konu"></textarea>
-<button class="btn" onclick="addSeries()">Seri Ekle</button>`;
+<input type="file" id="img" multiple class="input">
+<input id="sname" class="input" placeholder="Seri Adı">
+<textarea id="desc" class="input" placeholder="Konu"></textarea>
+<button class="btn" onclick="addSeries()">Seri + Bölüm Ekle</button>`;
 }
 
 function addSeries(){
-let f=img.files[0];
-if(!f) return alert("Görsel seç");
-let r=storage.ref("covers/"+f.name);
-r.put(f).then(()=>r.getDownloadURL().then(u=>{
-db.collection("series").add({name:sname.value,desc:desc.value,cover:u});
-alert("Seri eklendi");
-}));
+let files=[...img.files];
+let pages=[];
+Promise.all(files.map(f=>{
+let r=storage.ref("pages/"+Date.now()+f.name);
+return r.put(f).then(()=>r.getDownloadURL().then(u=>pages.push(u)));
+})).then(()=>{
+db.collection("series").add({name:sname.value,desc:desc.value})
+.then(r=>{
+r.collection("chapters").doc("1").set({no:1,pages});
+alert("Eklendi");
+})
+})
 }
 
-function showHome(){
-content.innerHTML=`<div class="title">New Episodes</div>`;
-db.collection("series").onSnapshot(s=>{
-s.forEach(d=>{
-content.innerHTML+=`<div class="card" onclick="openSeries('${d.id}')">${d.data().name}</div>`;
-});
-});
-}
-
-function showSeries(){showHome();}
-
-function openSeries(id){
-db.collection("series").doc(id).get().then(d=>{
-content.innerHTML=`
-<div class="title">${d.data().name}</div>
-<p>${d.data().desc}</p>
-<div class="card" onclick="openReader()">Bölüm 1</div>
-<div id="disqus_thread"></div>`;
-loadDisqus();
-});
-}
-
-function openReader(){
-content.innerHTML=`
-<div class="title">Bölüm Okuma</div>
-<div class="reader">
-<img src="https://via.placeholder.com/800x1200">
-<img src="https://via.placeholder.com/800x1200">
-</div>
-<div id="disqus_thread"></div>`;
-loadDisqus();
-}
-
+/* DISQUS */
 function loadDisqus(){
 var d=document,s=d.createElement('script');
 s.src='https://solarfansub-demo.disqus.com/embed.js';
