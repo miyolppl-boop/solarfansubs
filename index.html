@@ -13,103 +13,37 @@
 
 <style>
 body{margin:0;font-family:Arial;background:#000;color:#fff}
-header{
-position:fixed;top:0;left:0;
-width:100%;
-background:#000;z-index:1000;
-display:flex;justify-content:space-between;
-align-items:center;padding:15px;
-border-bottom:1px solid #222;
-box-sizing:border-box
-}
+header{position:fixed;top:0;left:0;width:100%;background:#000;z-index:1000;
+display:flex;justify-content:space-between;align-items:center;padding:15px;border-bottom:1px solid #222;box-sizing:border-box}
 .logo{color:#FFD84D;font-weight:bold}
 .menu-btn{font-size:26px;color:#FFD84D;cursor:pointer}
 
 .section{padding:90px 15px}
 .title{font-size:22px;border-left:4px solid #FFD84D;padding-left:10px;margin:15px 0}
 
-.card{
-background:#111;border:1px solid #222;
-border-radius:12px;padding:15px;
-margin-bottom:12px;cursor:pointer
-}
+.card{background:#111;border:1px solid #222;border-radius:12px;padding:15px;margin-bottom:12px;cursor:pointer}
 .card:hover{border-color:#FFD84D}
 
-.side-menu{
-position:fixed;
-top:0;right:-100%;
-width:85%;max-width:320px;
-height:100%;
-background:#0c0c0c;
-padding:20px;
-transition:.3s;
-z-index:2000;
-overflow-y:auto;
-box-sizing:border-box
-}
+.side-menu{position:fixed;top:0;right:-100%;width:85%;max-width:320px;height:100%;
+background:#0c0c0c;padding:20px;transition:.3s;z-index:2000;overflow-y:auto;box-sizing:border-box}
 .side-menu.active{right:0}
 
 .side-menu button,.side-menu a{
-width:100%;margin-bottom:10px;
-padding:12px;border-radius:8px;
-border:none;background:#FFD84D;
-color:#000;font-weight:bold;
-text-decoration:none;display:block
-}
+width:100%;margin-bottom:10px;padding:12px;border-radius:8px;border:none;
+background:#FFD84D;color:#000;font-weight:bold;text-decoration:none;display:block}
 .side-menu a{background:#111;color:#FFD84D}
 
-.input,textarea{
-width:100%;padding:12px;
-margin-bottom:10px;
-border-radius:8px;border:none;
-background:#222;color:#fff;
-box-sizing:border-box
-}
+.input,textarea{width:100%;padding:12px;margin-bottom:10px;border-radius:8px;border:none;background:#222;color:#fff}
+.search{width:100%;padding:12px;border-radius:10px;border:none;background:#222;color:#fff;margin-bottom:15px}
 
-.search{
-width:100%;padding:12px;
-border-radius:10px;border:none;
-background:#222;color:#fff;
-margin-bottom:15px
-}
+.reader img{width:100%;margin-bottom:10px;border-radius:6px}
+.reader-nav{display:flex;gap:10px;margin:15px 0}
+.reader-nav button{flex:1;padding:12px;border:none;border-radius:8px;background:#FFD84D;color:#000;font-weight:bold}
 
-.reader img{
-width:100%;
-margin-bottom:10px;
-border-radius:6px
-}
+.new-badge{background:#ff2d2d;color:#fff;font-size:11px;padding:3px 6px;border-radius:6px;margin-left:6px}
 
-.reader-nav{
-display:flex;justify-content:space-between;
-gap:10px;margin:15px 0
-}
-.reader-nav button{
-flex:1;padding:12px;
-border:none;border-radius:8px;
-background:#FFD84D;color:#000;
-font-weight:bold
-}
-
-.new-badge{
-background:#ff2d2d;color:#fff;
-font-size:11px;padding:3px 6px;
-border-radius:6px;margin-left:6px
-}
-
-.modal{
-position:fixed;inset:0;
-background:rgba(0,0,0,.85);
-display:none;
-align-items:center;
-justify-content:center;
-z-index:3000
-}
-.modal-box{
-background:#111;
-padding:20px;
-border-radius:12px;
-width:90%;max-width:360px
-}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:3000}
+.modal-box{background:#111;padding:20px;border-radius:12px;width:90%;max-width:360px}
 
 footer{text-align:center;color:#777;padding:30px;font-size:12px}
 </style>
@@ -125,6 +59,7 @@ footer{text-align:center;color:#777;padding:30px;font-size:12px}
 <div class="side-menu" id="menu">
 <button onclick="openLogin()">Üye Girişi</button>
 <button onclick="openRegister()">Üye Kaydı</button>
+<button onclick="logout()">Çıkış Yap</button>
 <a onclick="showHome()">Ana Sayfa</a>
 <a onclick="showFavorites()">Favoriler</a>
 <a onclick="adminLogin()">Admin Panel</a>
@@ -165,13 +100,14 @@ storageBucket:"solarfansubs-23416.appspot.com"
 
 const auth=firebase.auth();
 const db=firebase.firestore();
-
+const storage=firebase.storage();
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
 function toggleMenu(){menu.classList.toggle("active")}
 function openLogin(){loginModal.style.display="flex"}
 function openRegister(){registerModal.style.display="flex"}
 function closeModals(){loginModal.style.display=registerModal.style.display="none"}
+function logout(){auth.signOut();alert("Çıkış yapıldı")}
 
 function login(){
 if(!loginEmail.value||!loginPassword.value)return alert("Alanları doldur");
@@ -187,23 +123,18 @@ auth.createUserWithEmailAndPassword(regEmail.value,regPassword.value)
 }
 
 function showHome(){
-content.innerHTML=`
-<input class="search" placeholder="Seri ara..." oninput="searchSeries(this.value)">
+content.innerHTML=`<input class="search" placeholder="Seri ara..." oninput="searchSeries(this.value)">
 <div class="title">New Episodes</div>`;
 loadSeries();
 }
 
 function loadSeries(q=""){
 db.collection("series").onSnapshot(s=>{
-content.innerHTML=`
-<input class="search" placeholder="Seri ara..." oninput="searchSeries(this.value)">
+content.innerHTML=`<input class="search" placeholder="Seri ara..." oninput="searchSeries(this.value)">
 <div class="title">New Episodes</div>`;
 s.forEach(d=>{
 if(d.data().name.toLowerCase().includes(q.toLowerCase())){
-content.innerHTML+=`
-<div class="card" onclick="openSeries('${d.id}')">
-${d.data().name}
-</div>`;
+content.innerHTML+=`<div class="card" onclick="openSeries('${d.id}')">${d.data().name}</div>`;
 }
 });
 });
@@ -212,9 +143,7 @@ function searchSeries(q){loadSeries(q)}
 
 function openSeries(id){
 db.collection("series").doc(id).get().then(d=>{
-content.innerHTML=`
-<div class="title">${d.data().name}</div>
-<p>${d.data().desc}</p>
+content.innerHTML=`<div class="title">${d.data().name}</div><p>${d.data().desc}</p>
 <button onclick="addFav('${id}')">⭐ Favori</button>`;
 db.collection("series").doc(id).collection("chapters").orderBy("no")
 .onSnapshot(c=>{
@@ -230,19 +159,39 @@ ${isNew?'<span class="new-badge">NEW</span>':''}
 });
 }
 
-function openReader(id,no){
-content.innerHTML=`
-<div class="title">Bölüm ${no}</div>
-<div class="reader">`;
-for(let i=1;i<=5;i++){
-content.innerHTML+=`<img src="https://via.placeholder.com/800x1200">`;
+async function openReader(seriesId,no){
+content.innerHTML=`<div class="title">Bölüm ${no}</div><div class="reader">`;
+const doc=await db.collection("series").doc(seriesId)
+.collection("chapters").doc(String(no)).get();
+const pages=doc.data().pages;
+
+for(let i=1;i<=pages;i++){
+const url=await storage.ref(`series/${seriesId}/chapters/${no}/${i}.jpg`).getDownloadURL();
+content.innerHTML+=`<img src="${url}">`;
 }
+
 content.innerHTML+=`
-</div>
 <div class="reader-nav">
-<button onclick="openReader('${id}',${no-1})">◀ Önceki</button>
-<button onclick="openReader('${id}',${no+1})">Sonraki ▶</button>
-</div>`;
+<button onclick="openReader('${seriesId}',${no-1})">◀ Önceki</button>
+<button onclick="openReader('${seriesId}',${no+1})">Sonraki ▶</button>
+</div>
+<div id="disqus_thread"></div>`;
+loadDisqus(seriesId,no);
+}
+
+function loadDisqus(seriesId,no){
+window.disqus_config=function(){
+this.page.identifier=seriesId+"-"+no;
+this.page.url=location.href;
+};
+if(window.DISQUS){
+DISQUS.reset({reload:true,config:disqus_config});
+}else{
+let d=document,s=d.createElement("script");
+s.src="https://solarfansub-demo.disqus.com/embed.js";
+s.setAttribute("data-timestamp",+new Date());
+d.body.appendChild(s);
+}
 }
 
 function addFav(id){
@@ -263,32 +212,26 @@ content.innerHTML+=`<div class="card">${d.data().name}</div>`;
 }
 
 function adminLogin(){
-let p=prompt("Admin şifre");
-if(p!=="alamuzpulum3929")return alert("Hatalı");
+auth.onAuthStateChanged(u=>{
+if(!u || u.email!=="flesflww@gmail.com")return alert("Yetkin yok");
 content.innerHTML=`
 <div class="title">Admin Panel</div>
-<input class="input" id="sname" placeholder="Seri Adı">
-<textarea class="input" id="sdesc" placeholder="Konu"></textarea>
-<button onclick="addSeries()">Seri Ekle</button>
-<hr>
 <input class="input" id="sid" placeholder="Seri ID">
 <input class="input" id="chap" placeholder="Bölüm No">
-<button onclick="addChapter()">Bölüm Ekle</button>`;
+<input class="input" type="file" id="imgs" multiple>
+<button onclick="uploadChapter()">Bölüm Yükle</button>`;
+});
 }
 
-function addSeries(){
-db.collection("series").add({
-name:sname.value,
-desc:sdesc.value,
-created:Date.now()
-});
-alert("Seri eklendi");
+async function uploadChapter(){
+const sidv=sid.value,no=chap.value,files=imgs.files;
+for(let i=0;i<files.length;i++){
+await storage.ref(`series/${sidv}/chapters/${no}/${i+1}.jpg`).put(files[i]);
 }
-function addChapter(){
-db.collection("series").doc(sid.value)
-.collection("chapters")
-.add({no:Number(chap.value),created:Date.now()});
-alert("Bölüm eklendi");
+await db.collection("series").doc(sidv)
+.collection("chapters").doc(String(no))
+.set({no:Number(no),pages:files.length,created:Date.now()});
+alert("Bölüm yüklendi");
 }
 
 showHome();
