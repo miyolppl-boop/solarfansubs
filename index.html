@@ -13,35 +13,62 @@
 
 <style>
 body{margin:0;font-family:Arial;background:#000;color:#fff}
-header{position:fixed;top:0;width:100%;background:#000;z-index:50;
-display:flex;justify-content:space-between;align-items:center;padding:15px;border-bottom:1px solid #222}
-.logo{color:#FFE37A;font-weight:bold;font-size:20px}
-.menu-btn{font-size:22px;color:#FFE37A;cursor:pointer}
+header{
+position:fixed;top:0;width:100%;
+background:#000;z-index:100;
+display:flex;justify-content:space-between;
+align-items:center;padding:15px;
+border-bottom:1px solid #222;
+max-width:100vw;overflow:hidden
+}
+.logo{color:#FFD84D;font-weight:bold}
+.menu-btn{font-size:24px;color:#FFD84D;cursor:pointer}
 
 .section{padding:90px 15px}
-.title{font-size:22px;border-left:4px solid #FFE37A;padding-left:10px;margin-bottom:15px}
+.title{font-size:22px;border-left:4px solid #FFD84D;padding-left:10px;margin:15px 0}
 
-.card{background:#111;border:1px solid #222;border-radius:12px;padding:15px;margin-bottom:12px}
-.card:hover{border-color:#FFE37A}
+.card{background:#111;border:1px solid #222;border-radius:12px;padding:15px;margin-bottom:12px;cursor:pointer}
+.card:hover{border-color:#FFD84D}
 
-.side-menu{position:fixed;top:0;left:-260px;width:250px;height:100%;
-background:#0c0c0c;padding:20px;transition:.3s;z-index:100}
-.side-menu.active{left:0}
-.side-menu a, .side-menu button{display:block;width:100%;margin:10px 0}
+.side-menu{
+position:fixed;
+top:0;right:-280px;
+width:280px;height:100%;
+background:#0c0c0c;
+padding:20px;
+transition:.3s;
+z-index:200;
+overflow-y:auto
+}
+.side-menu.active{right:0}
+
+.side-menu button,.side-menu a{
+width:100%;margin-bottom:10px;
+padding:12px;border-radius:8px;
+border:none;background:#FFD84D;
+color:#000;font-weight:bold;
+text-decoration:none;display:block
+}
+.side-menu a{background:#111;color:#FFD84D}
 
 .input{width:100%;padding:12px;margin-bottom:10px;border-radius:8px;border:none;background:#222;color:#fff}
-.btn{padding:12px;border:none;border-radius:8px;background:#FFE37A;color:#000;font-weight:bold}
-.btn-outline{background:none;border:1px solid #FFE37A;color:#FFE37A}
-
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;
-background:rgba(0,0,0,.85);justify-content:center;align-items:center;z-index:200}
-.modal-content{background:#111;padding:20px;width:90%;max-width:420px;border-radius:14px}
 
 .reader img{width:100%;margin-bottom:10px;border-radius:6px}
 
-.search{width:100%;padding:12px;border:none;border-radius:10px;background:#222;color:#fff;margin-bottom:15px}
+.new-badge{
+background:#ff2d2d;color:#fff;
+font-size:11px;padding:3px 6px;
+border-radius:6px;margin-left:6px
+}
 
-footer{text-align:center;padding:30px;color:#666;font-size:12px}
+.search{
+width:100%;padding:12px;
+border-radius:10px;border:none;
+background:#222;color:#fff;
+margin-bottom:15px
+}
+
+footer{text-align:center;color:#777;padding:30px;font-size:12px}
 </style>
 </head>
 
@@ -53,38 +80,19 @@ footer{text-align:center;padding:30px;color:#666;font-size:12px}
 </header>
 
 <div class="side-menu" id="menu">
-<button class="btn" onclick="openLogin()">Üye Girişi</button>
-<button class="btn-outline" onclick="openRegister()">Üye Kaydı</button>
-<button class="btn-outline" onclick="showHome()">Ana Sayfa</button>
-<button class="btn-outline" onclick="showFavorites()">Favoriler</button>
-<button class="btn-outline" onclick="adminLogin()">Admin</button>
+<button onclick="openLogin()">Üye Girişi</button>
+<button onclick="openRegister()">Üye Kaydı</button>
+<a onclick="showHome()">Ana Sayfa</a>
+<a onclick="showFavorites()">Favoriler</a>
+<a onclick="adminLogin()">Admin</a>
 </div>
 
 <div class="section" id="content"></div>
-
 <footer>© SolarFansub</footer>
 
-<!-- LOGIN -->
-<div class="modal" id="loginModal">
-<div class="modal-content">
-<h3>Üye Girişi</h3>
-<input id="loginEmail" class="input" placeholder="E-posta">
-<input id="loginPassword" type="password" class="input" placeholder="Şifre">
-<button class="btn" onclick="login()">Giriş Yap</button>
-<button class="btn-outline" onclick="closeModals()">Kapat</button>
-</div>
-</div>
-
-<!-- REGISTER -->
-<div class="modal" id="registerModal">
-<div class="modal-content">
-<h3>Üye Kaydı</h3>
-<input id="regEmail" class="input" placeholder="E-posta">
-<input id="regPassword" type="password" class="input" placeholder="Şifre">
-<button class="btn" onclick="register()">Kayıt Ol</button>
-<button class="btn-outline" onclick="closeModals()">Kapat</button>
-</div>
-</div>
+<!-- MODALS -->
+<div class="modal" id="loginModal"></div>
+<div class="modal" id="registerModal"></div>
 
 <script>
 firebase.initializeApp({
@@ -93,141 +101,105 @@ authDomain:"solarfansubs-23416.firebaseapp.com",
 projectId:"solarfansubs-23416",
 storageBucket:"solarfansubs-23416.appspot.com"
 });
-
 const auth=firebase.auth();
 const db=firebase.firestore();
 const storage=firebase.storage();
 
 function toggleMenu(){menu.classList.toggle("active")}
-function openLogin(){loginModal.style.display="flex"}
-function openRegister(){registerModal.style.display="flex"}
-function closeModals(){loginModal.style.display=registerModal.style.display="none"}
 
-auth.onAuthStateChanged(u=>{ if(u)showHome(); });
-
-function login(){
-if(!loginEmail.value||!loginPassword.value)return alert("Doldur");
-auth.signInWithEmailAndPassword(loginEmail.value,loginPassword.value)
-.then(()=>closeModals()).catch(e=>alert(e.message))
-}
-
-function register(){
-if(!regEmail.value||!regPassword.value)return alert("Doldur");
-auth.createUserWithEmailAndPassword(regEmail.value,regPassword.value)
-.then(()=>closeModals()).catch(e=>alert(e.message))
-}
-
-/* HOME + SEARCH */
 function showHome(){
 content.innerHTML=`
-<input class="search" placeholder="Seri ara..." onkeyup="searchSeries(this.value)">
+<input class="search" placeholder="Seri ara..." oninput="searchSeries(this.value)">
 <div class="title">New Episodes</div>`;
 loadSeries();
 }
 
-function loadSeries(){
-db.collection("series").get().then(s=>{
-s.forEach(d=>{
-content.innerHTML+=`
-<div class="card" onclick="openSeries('${d.id}')">${d.data().name}</div>`;
-})
-})
-}
-
-function searchSeries(q){
-content.innerHTML=`<input class="search" placeholder="Seri ara..." onkeyup="searchSeries(this.value)" value="${q}">`;
-db.collection("series").get().then(s=>{
+function loadSeries(q=""){
+db.collection("series").onSnapshot(s=>{
+content.innerHTML=`
+<input class="search" placeholder="Seri ara..." oninput="searchSeries(this.value)">
+<div class="title">New Episodes</div>`;
 s.forEach(d=>{
 if(d.data().name.toLowerCase().includes(q.toLowerCase())){
-content.innerHTML+=`<div class="card" onclick="openSeries('${d.id}')">${d.data().name}</div>`;
+content.innerHTML+=`
+<div class="card" onclick="openSeries('${d.id}')">${d.data().name}</div>`;
 }
-})
-})
+});
+});
 }
 
-/* SERIES */
+function searchSeries(q){loadSeries(q)}
+
 function openSeries(id){
 db.collection("series").doc(id).get().then(d=>{
 content.innerHTML=`
 <div class="title">${d.data().name}</div>
 <p>${d.data().desc}</p>
-<button class="btn-outline" onclick="addFav('${id}')">❤️ Favori</button>`;
-db.collection("series").doc(id).collection("chapters").orderBy("no").get().then(c=>{
+<button onclick="addFav('${id}')">⭐ Favori</button>`;
+db.collection("series").doc(id).collection("chapters").orderBy("no")
+.onSnapshot(c=>{
 c.forEach(ch=>{
+let isNew=Date.now()-ch.data().created<3*86400000;
 content.innerHTML+=`
-<div class="card" onclick="openReader('${id}','${ch.id}')">Bölüm ${ch.data().no}</div>`;
-})
-})
-})
+<div class="card" onclick="openReader('${id}',${ch.data().no})">
+Bölüm ${ch.data().no}
+${isNew?'<span class="new-badge">NEW</span>':''}
+</div>`;
+});
+});
+});
 }
 
-/* READER */
-function openReader(sid,cid){
-content.innerHTML=`<div class="title">Okuma</div><div class="reader" id="reader"></div>
-<div id="disqus_thread"></div>`;
-db.collection("series").doc(sid).collection("chapters").doc(cid).get().then(d=>{
-d.data().pages.forEach(p=>{
-reader.innerHTML+=`<img src="${p}">`;
-})
-loadDisqus();
-})
+function openReader(id,no){
+content.innerHTML=`<div class="title">Bölüm ${no}</div>`;
+for(let i=1;i<=5;i++){
+content.innerHTML+=`<img src="https://via.placeholder.com/800x1200">`;
+}
+content.innerHTML+=`
+<button onclick="openReader('${id}',${no-1})">◀ Önceki</button>
+<button onclick="openReader('${id}',${no+1})">Sonraki ▶</button>`;
 }
 
-/* FAVORI */
 function addFav(id){
-if(!auth.currentUser)return alert("Giriş yap");
-db.collection("users").doc(auth.currentUser.uid)
-.collection("fav").doc(id).set({t:Date.now()});
+let f=JSON.parse(localStorage.getItem("fav")||"[]");
+if(!f.includes(id)){f.push(id)}
+localStorage.setItem("fav",JSON.stringify(f));
 alert("Favorilere eklendi");
 }
 
 function showFavorites(){
-if(!auth.currentUser)return alert("Giriş yap");
+let f=JSON.parse(localStorage.getItem("fav")||"[]");
 content.innerHTML=`<div class="title">Favoriler</div>`;
-db.collection("users").doc(auth.currentUser.uid).collection("fav").get().then(f=>{
-f.forEach(d=>{
-openSeries(d.id);
-})
-})
+f.forEach(id=>{
+db.collection("series").doc(id).get().then(d=>{
+content.innerHTML+=`<div class="card">${d.data().name}</div>`;
+});
+});
 }
 
-/* ADMIN */
 function adminLogin(){
-let p=prompt("Admin şifre:");
-if(p==="alamuzpulum3929")adminPanel();
-else alert("Hatalı");
-}
-
-function adminPanel(){
+let p=prompt("Admin şifre");
+if(p==="alamuzpulum3929"){
 content.innerHTML=`
 <div class="title">Admin Panel</div>
-<input type="file" id="img" multiple class="input">
-<input id="sname" class="input" placeholder="Seri Adı">
-<textarea id="desc" class="input" placeholder="Konu"></textarea>
-<button class="btn" onclick="addSeries()">Seri + Bölüm Ekle</button>`;
+<input class="input" id="sname" placeholder="Seri Adı">
+<textarea class="input" id="sdesc" placeholder="Konu"></textarea>
+<button onclick="addSeries()">Seri Ekle</button>
+<input class="input" id="sid" placeholder="Seri ID">
+<input class="input" id="chap" placeholder="Bölüm No">
+<button onclick="addChapter()">Bölüm Ekle</button>`;
+}
 }
 
 function addSeries(){
-let files=[...img.files];
-let pages=[];
-Promise.all(files.map(f=>{
-let r=storage.ref("pages/"+Date.now()+f.name);
-return r.put(f).then(()=>r.getDownloadURL().then(u=>pages.push(u)));
-})).then(()=>{
-db.collection("series").add({name:sname.value,desc:desc.value})
-.then(r=>{
-r.collection("chapters").doc("1").set({no:1,pages});
-alert("Eklendi");
-})
-})
+db.collection("series").add({name:sname.value,desc:sdesc.value});
+alert("Seri eklendi");
 }
 
-/* DISQUS */
-function loadDisqus(){
-var d=document,s=d.createElement('script');
-s.src='https://solarfansub-demo.disqus.com/embed.js';
-s.setAttribute('data-timestamp',+new Date());
-(d.head||d.body).appendChild(s);
+function addChapter(){
+db.collection("series").doc(sid.value).collection("chapters")
+.add({no:Number(chap.value),created:Date.now()});
+alert("Bölüm eklendi");
 }
 
 showHome();
